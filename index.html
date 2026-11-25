@@ -1,0 +1,3435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EL PRÓXIMO GANADOR — TU APP QUE SÍ TE PAGA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #120224;
+            --neon-pink: #ff2a85;
+            --neon-cyan: #00e5ff;
+            --neon-gold: #ffd426;
+            --neon-emerald: #34d399;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        input {
+            user-select: text;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background:
+                radial-gradient(circle at 50% -10%, rgba(255, 42, 133, 0.28), transparent 48%),
+                radial-gradient(circle at 15% 22%, rgba(255, 212, 38, 0.16), transparent 45%),
+                radial-gradient(circle at 85% 28%, rgba(0, 229, 255, 0.16), transparent 45%),
+                linear-gradient(180deg, #28064d 0%, #120224 56%, #06000e 100%);
+            color: #fff8ff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .font-display {
+            font-family: 'Fredoka', 'Inter', sans-serif;
+            letter-spacing: 0.02em;
+        }
+
+        .epg-vertical-machine {
+            width: 100%;
+            max-width: 454px;
+            margin: 0 auto;
+            background:
+                radial-gradient(circle at 50% 66%, rgba(255, 212, 38, 0.11) 1.5px, transparent 2px),
+                radial-gradient(circle at 50% 66%, rgba(168, 85, 247, 0.20) 2px, transparent 2.8px),
+                linear-gradient(180deg, #32085c 0%, #16032c 48%, #090114 100%);
+            background-size: 24px 24px, 16px 16px, 100% 100%;
+            border: 2px solid rgba(255, 215, 64, 0.78);
+            box-shadow:
+                0 0 0 2px rgba(120, 53, 15, 0.85) inset,
+                0 1px 0 rgba(255, 255, 255, 0.35) inset,
+                0 0 42px rgba(255, 200, 30, 0.24),
+                0 22px 55px rgba(0, 0, 0, 0.92);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .epg-paytable-panel {
+            background:
+                radial-gradient(circle at 50% 0%, rgba(255, 212, 38, 0.18), transparent 65%),
+                linear-gradient(180deg, #541494 0%, #27064a 100%);
+            border-bottom: 2px solid rgba(255, 212, 38, 0.65);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+        }
+
+        .epg-pay-cell {
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.03) 45%, rgba(12, 2, 28, 0.72) 100%);
+            border: 1px solid rgba(255, 224, 102, 0.24);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.22),
+                0 4px 10px rgba(0, 0, 0, 0.45);
+            border-radius: 10px;
+            padding: 5px 6px;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+        }
+
+        .epg-pay-cell.is-highlighted {
+            border-color: #ffe066;
+            background: linear-gradient(180deg, rgba(255, 212, 38, 0.42) 0%, rgba(255, 42, 133, 0.30) 100%);
+            box-shadow:
+                0 0 18px rgba(255, 212, 38, 0.9),
+                inset 0 1px 1px rgba(255, 255, 255, 0.6);
+            transform: scale(1.03);
+        }
+
+        .epg-reels-box {
+            background: linear-gradient(180deg, #420c78 0%, #1d0438 50%, #420c78 100%);
+            border-top: 2px solid #fbbf24;
+            border-bottom: 2px solid #fbbf24;
+            box-shadow:
+                inset 0 10px 22px rgba(0, 0, 0, 0.82),
+                inset 0 -10px 22px rgba(0, 0, 0, 0.82);
+        }
+
+        #slot-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .epg-sensational-banner {
+            background:
+                repeating-conic-gradient(from 0deg, rgba(255, 224, 102, 0.26) 0deg 15deg, rgba(255, 255, 255, 0.04) 15deg 30deg),
+                radial-gradient(circle at 50% 50%, #ff2a85 0%, #9d174d 62%, #2e054e 100%);
+            border-bottom: 2px solid #ffd426;
+            box-shadow: 0 6px 24px rgba(255, 42, 133, 0.45);
+        }
+
+        .epg-sensational-text {
+            font-family: 'Fredoka', sans-serif;
+            color: #ffe066;
+            text-shadow:
+                0 2px 0 #7c2d12,
+                0 4px 0 #450a0a,
+                0 0 22px rgba(255, 212, 38, 0.95);
+            transform: rotate(-2.5deg);
+        }
+
+        .epg-control-circle {
+            background:
+                radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.24) 0%, rgba(76, 29, 149, 0.75) 38%, rgba(20, 4, 46, 0.96) 78%, rgba(8, 1, 20, 1) 100%);
+            border: 2px solid rgba(255, 220, 105, 0.55);
+            box-shadow:
+                0 8px 20px rgba(0, 0, 0, 0.85),
+                inset 0 1.5px 2px rgba(255, 255, 255, 0.35),
+                inset 0 -3px 6px rgba(0, 0, 0, 0.75);
+            transition: transform 0.1s ease, filter 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+        }
+
+        .epg-control-circle:hover:not(:disabled) {
+            filter: brightness(1.14);
+            border-color: #ffd426;
+            box-shadow:
+                0 8px 24px rgba(255, 212, 38, 0.32),
+                inset 0 1.5px 2px rgba(255, 255, 255, 0.45);
+        }
+
+        .epg-control-circle:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        .epg-control-circle:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .epg-control-circle.is-active {
+            border-color: #34d399;
+            box-shadow: 0 0 22px rgba(52, 211, 153, 0.75), inset 0 1px 2px rgba(255, 255, 255, 0.45);
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 24px rgba(52, 211, 153, 0.48), 0 0 42px rgba(255, 212, 38, 0.35); }
+            50% { transform: scale(1.015); box-shadow: 0 0 36px rgba(255, 42, 133, 0.65), 0 0 56px rgba(0, 229, 255, 0.45); }
+        }
+
+        .recharge-celebration {
+            animation: pulseGlow 1.6s infinite ease-in-out;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 212, 38, 0.42);
+            border-radius: 999px;
+        }
+    </style>
+</head>
+<body class="p-2 sm:p-4">
+
+    <!-- Pista musical oficial de EL PRÓXIMO GANADOR -->
+    <audio id="custom-bg-music" src="casino.mp3" loop preload="auto"></audio>
+
+    <!-- 1. PANEL CARGANDO LA PARTIDA -->
+    <div id="loading-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 bg-gradient-to-br from-[#2b0652] via-[#140229] to-[#070010]">
+        <div class="max-w-md w-full rounded-3xl bg-white/10 backdrop-blur-xl border-2 border-amber-300/65 p-7 text-center space-y-5 shadow-2xl">
+            <div class="text-5xl animate-bounce">👑💎🔥</div>
+            <div class="space-y-1.5">
+                <p class="text-xs font-black uppercase tracking-widest text-amber-300">Preparando Sala y Banca HD</p>
+                <h2 class="font-display text-2xl sm:text-3xl font-bold bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300 bg-clip-text text-transparent">
+                    EL PRÓXIMO GANADOR
+                </h2>
+                <p id="loading-status-text" class="text-xs sm:text-sm text-fuchsia-100/85">
+                    Conectando con Firebase y verificando tu saldo en tiempo real.
+                </p>
+            </div>
+            <div class="w-full h-3 rounded-full bg-black/50 border border-white/15 overflow-hidden p-0.5">
+                <div id="loading-bar" class="h-full w-1/3 rounded-full bg-gradient-to-r from-pink-500 via-amber-300 to-cyan-400 transition-all duration-300"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor Principal -->
+    <div id="app-shell" class="hidden max-w-4xl mx-auto space-y-3">
+
+        <!-- ANUNCIO DE RECARGA EXITOSA -->
+        <div id="recharge-success-banner" class="hidden recharge-celebration rounded-3xl p-4 sm:p-5 bg-gradient-to-r from-fuchsia-600 via-amber-400 to-emerald-400 border-2 border-white shadow-2xl text-slate-950">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="space-y-1">
+                    <div class="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-slate-950 text-yellow-300 text-xs font-black uppercase">
+                        <span>🏆 ¡RECARGA EXITOSA ACREDITADA!</span>
+                        <span id="recharge-banner-amount" class="text-emerald-300">+$0</span>
+                    </div>
+                    <h3 class="font-display text-xl sm:text-2xl font-bold text-slate-950">
+                        ¡Tu saldo ya cayó y está listo para romperla!
+                    </h3>
+                    <p id="recharge-banner-detail" class="text-xs sm:text-sm font-extrabold text-slate-900">
+                        Nuevo saldo disponible para girar ahora mismo.
+                    </p>
+                </div>
+                <button type="button" id="btn-dismiss-recharge-banner" class="self-start sm:self-center px-4 py-2.5 rounded-2xl bg-slate-950 hover:bg-slate-800 text-yellow-300 font-black text-xs sm:text-sm shadow-lg transition">
+                    🔥 ¡A JUGAR!
+                </button>
+            </div>
+        </div>
+
+        <!-- BARRA SUPERIOR DE EL PRÓXIMO GANADOR -->
+        <header class="rounded-2xl bg-black/55 backdrop-blur-md border border-amber-300/35 px-3 py-2 shadow-xl">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center flex-wrap gap-1.5">
+                    <span class="font-display text-sm sm:text-base font-bold bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300 bg-clip-text text-transparent">
+                        EL PRÓXIMO GANADOR · TU APP QUE SÍ TE PAGA
+                    </span>
+                    <span id="pill-sync" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-400/35">
+                        En línea (Firebase)
+                    </span>
+                    <span id="pill-room" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-200 border border-cyan-300/35">
+                        🌐 Sala: MESA_VIP_01
+                    </span>
+                    <span id="pill-player" class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/10 text-amber-100 border border-white/15">
+                        Sin jugador activo
+                    </span>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <button type="button" id="btn-music-toggle" class="px-2.5 py-1 rounded-lg bg-pink-500/25 hover:bg-pink-500/40 border border-pink-300/40 text-white font-bold text-[10px] flex items-center gap-1 transition">
+                        <span id="music-icon">🎶</span>
+                        <span id="music-label">Música: ON</span>
+                    </button>
+                    <button type="button" id="btn-switch-user" class="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-[10px] transition">
+                        👤 Cambiar
+                    </button>
+                    <button type="button" id="btn-open-admin" class="px-2 py-1 rounded-lg bg-amber-400/25 hover:bg-amber-400/40 border border-amber-300/50 text-amber-200 font-extrabold text-[10px] transition">
+                        🔐 Admin
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- PANTALLA DE INGRESO SENCILLA -->
+        <section id="entry-screen" class="rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 p-4 sm:p-6 shadow-2xl space-y-4">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+                <div class="lg:col-span-5 rounded-2xl bg-gradient-to-br from-cyan-500/20 via-indigo-600/20 to-fuchsia-600/20 border border-cyan-300/40 p-5 flex flex-col justify-between space-y-4">
+                    <div class="space-y-2.5">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-400/20 border border-cyan-300/45 text-cyan-200 text-xs font-extrabold">
+                            ✨ PRUEBA RÁPIDA HD
+                        </span>
+                        <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">Modo Demo</h2>
+                        <p class="text-xs sm:text-sm text-cyan-50/90 leading-relaxed">
+                            Prueba <strong class="text-yellow-300">EL PRÓXIMO GANADOR</strong> en alta definición con <strong class="text-emerald-300">$50.000</strong> de práctica, giro turbo manteniendo pulsado y tirada automática.
+                        </p>
+                    </div>
+                    <button type="button" id="btn-start-demo" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-cyan-300 via-teal-300 to-emerald-300 hover:brightness-105 text-slate-950 font-black text-sm shadow-lg transition">
+                        🚀 Entrar en Modo Demo
+                    </button>
+                </div>
+
+                <div class="lg:col-span-7 rounded-2xl bg-gradient-to-br from-pink-500/20 via-purple-600/15 to-amber-500/20 border border-pink-300/40 p-5 space-y-4">
+                    <div class="space-y-1">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-500/25 border border-pink-300/45 text-pink-200 text-xs font-extrabold">
+                            💎 INGRESO RÁPIDO
+                        </span>
+                        <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">Entra con tu Nick</h2>
+                        <p class="text-xs sm:text-sm text-fuchsia-100/85">
+                            Solo necesitas tu <strong>Nick</strong>, tu <strong>WhatsApp</strong> y tu <strong>PIN de 4 dígitos</strong>.
+                        </p>
+                    </div>
+
+                    <form id="player-entry-form" class="space-y-3">
+                        <div>
+                            <label for="inp-nick" class="block text-xs font-bold text-amber-200 mb-1">Nick *</label>
+                            <input id="inp-nick" type="text" required placeholder="Ej: Sebasflow" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-white/20 text-white text-sm placeholder-white/40 focus:outline-none focus:border-amber-300">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label for="inp-whatsapp" class="block text-xs font-bold text-amber-200 mb-1">Número de WhatsApp *</label>
+                                <input id="inp-whatsapp" type="tel" required placeholder="Ej: 3023607054" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-white/20 text-white text-sm placeholder-white/40 focus:outline-none focus:border-amber-300">
+                            </div>
+                            <div>
+                                <label for="inp-pin" class="block text-xs font-bold text-amber-200 mb-1">PIN de 4 dígitos *</label>
+                                <input id="inp-pin" type="password" inputmode="numeric" maxlength="4" pattern="\d{4}" required placeholder="••••" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-white/20 text-white text-sm placeholder-white/40 focus:outline-none focus:border-amber-300 tracking-widest">
+                            </div>
+                        </div>
+
+                        <div id="entry-error" class="hidden rounded-xl bg-rose-500/25 border border-rose-400/50 px-3.5 py-2 text-xs font-bold text-rose-100"></div>
+
+                        <button type="submit" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-amber-300 via-pink-500 to-fuchsia-600 hover:brightness-105 text-white font-black text-sm shadow-lg transition">
+                            🎰 Jugar Ahora
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- NOTAS IMPORTANTES EN PANTALLA DE INGRESO -->
+            <div class="rounded-2xl bg-black/45 border border-amber-300/30 p-3.5 text-[11px] text-amber-100/90 space-y-1">
+                <div class="font-black text-amber-300 uppercase text-[10px]">📌 Notas importantes</div>
+                <p>1. Este espacio está pensado principalmente como un <strong>juego recreativo para pasar el rato</strong> y probar suerte en cualquier momento.</p>
+                <p>2. Si decides apostar y ganar, hazlo siempre <strong>con responsabilidad</strong>, controlando tu tiempo y tu presupuesto.</p>
+                <p>3. Existen <strong>combinaciones secretas de secuencias de apuestas</strong> para premios inmediatos desde <strong>$5.000</strong>.</p>
+            </div>
+        </section>
+
+        <!-- GABINETE VERTICAL HD DE EL PRÓXIMO GANADOR -->
+        <main id="game-workspace" class="hidden space-y-3">
+
+            <!-- Barra superior de acciones de saldo encima del gabinete -->
+            <div class="max-w-[454px] mx-auto flex items-center justify-between gap-2 px-1">
+                <button type="button" id="btn-refresh-balance" class="px-2.5 py-1.5 rounded-xl bg-cyan-400/20 hover:bg-cyan-400/35 border border-cyan-300/45 text-cyan-200 font-extrabold text-[11px] transition">
+                    🔄 Actualizar Saldo
+                </button>
+                <div class="flex items-center gap-2">
+                    <button type="button" id="btn-open-recharge" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-300 hover:brightness-105 text-slate-950 font-black text-xs shadow transition">
+                        💳 Recargar
+                    </button>
+                    <button type="button" id="btn-open-withdraw" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-300 to-orange-400 hover:brightness-105 text-slate-950 font-black text-xs shadow transition">
+                        💸 Retirar
+                    </button>
+                </div>
+            </div>
+
+            <!-- GABINETE VERTICAL COMPACTO -->
+            <section class="epg-vertical-machine rounded-2xl">
+
+                <!-- 1. TABLA DE PAGOS SUPERIOR CON MARCA EL PRÓXIMO GANADOR -->
+                <div class="epg-paytable-panel p-2 space-y-1.5">
+                    <div class="grid grid-cols-3 gap-1.5 items-stretch">
+                        <div class="space-y-1.5">
+                            <div id="paycell-joker" class="epg-pay-cell flex items-center gap-1.5">
+                                <span class="text-xl leading-none shrink-0 drop-shadow">🤡</span>
+                                <div class="text-[9px] leading-tight font-extrabold text-amber-100">
+                                    <div>5 · <span id="p-joker-5" class="text-yellow-300">$10.000</span></div>
+                                    <div>4 · <span id="p-joker-4" class="text-yellow-200">$2.000</span></div>
+                                    <div>3 · <span id="p-joker-3" class="text-amber-200/85">$200</span></div>
+                                </div>
+                            </div>
+
+                            <div id="paycell-guitar" class="epg-pay-cell flex items-center gap-1.5">
+                                <span class="text-xl leading-none shrink-0 drop-shadow">🎸</span>
+                                <div class="text-[9px] leading-tight font-extrabold text-amber-100">
+                                    <div>5 · <span id="p-guitar-5" class="text-yellow-300">$3.000</span></div>
+                                    <div>4 · <span id="p-guitar-4" class="text-yellow-200">$600</span></div>
+                                    <div>3 · <span id="p-guitar-3" class="text-amber-200/85">$150</span></div>
+                                </div>
+                            </div>
+
+                            <div id="paycell-red_gem" class="epg-pay-cell flex items-center gap-1.5">
+                                <span class="text-xl leading-none shrink-0 drop-shadow">♦️</span>
+                                <div class="text-[9px] leading-tight font-extrabold text-amber-100">
+                                    <div>5 · <span id="p-red_gem-5" class="text-yellow-300">$600</span></div>
+                                    <div>4 · <span id="p-red_gem-4" class="text-yellow-200">$150</span></div>
+                                    <div>3 · <span id="p-red_gem-3" class="text-amber-200/85">$60</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5 flex flex-col justify-between">
+                            <div class="text-center py-0.5">
+                                <div class="font-display text-sm sm:text-base font-bold leading-tight bg-gradient-to-b from-yellow-200 via-amber-400 to-orange-500 bg-clip-text text-transparent drop-shadow">
+                                    EL PRÓXIMO GANADOR
+                                </div>
+                                <div class="inline-block mt-0.5 px-2 py-0.2 rounded-full bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500 text-slate-950 font-black text-[8.5px] uppercase tracking-wider shadow">
+                                    HD · BONUS
+                                </div>
+                            </div>
+
+                            <div id="paycell-pins" class="epg-pay-cell flex items-center gap-1.5">
+                                <span class="text-xl leading-none shrink-0 drop-shadow">🎳</span>
+                                <div class="text-[9px] leading-tight font-extrabold text-amber-100">
+                                    <div>5 · <span id="p-pins-5" class="text-yellow-300">$3.000</span></div>
+                                    <div>4 · <span id="p-pins-4" class="text-yellow-200">$600</span></div>
+                                    <div>3 · <span id="p-pins-3" class="text-amber-200/85">$150</span></div>
+                                </div>
+                            </div>
+
+                            <div id="paycell-blue_gem" class="epg-pay-cell flex items-center gap-1.5">
+                                <span class="text-xl leading-none shrink-0 drop-shadow">💠</span>
+                                <div class="text-[9px] leading-tight font-extrabold text-amber-100">
+                                    <div>5 · <span id="p-blue_gem-5" class="text-yellow-300">$600</span></div>
+                                    <div>4 · <span id="p-blue_gem-4" class="text-yellow-200">$120</span></div>
+                                    <div>3 · <span id="p-blue_gem-3" class="text-amber-200/85">$60</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <div id="paycell-crown" class="epg-pay-cell flex items-center gap-1.5 border-amber-300/50">
+                                <span class="text-xl leading-none shrink-0 drop-shadow">👑</span>
+                                <div class="text-[9px] leading-tight font-extrabold text-amber-100">
+                                    <div>5 · <span id="p-crown-5" class="text-yellow-300">$5.000</span></div>
+                                    <div>4 · <span id="p-crown-4" class="text-yellow-200">$750</span></div>
+                                    <div>3 · <span id="p-crown-3" class="text-amber-200/85">$150</span></div>
+                                </div>
+                            </div>
+
+                            <div id="paycell-jester_shoes" class="epg-pay-cell flex items-center gap-1.5">
+                                <span class="text-xl leading-none shrink-0 drop-shadow">👟</span>
+                                <div class="text-[9px] leading-tight font-extrabold text-amber-100">
+                                    <div>5 · <span id="p-jester_shoes-5" class="text-yellow-300">$600</span></div>
+                                    <div>4 · <span id="p-jester_shoes-4" class="text-yellow-200">$150</span></div>
+                                    <div>3 · <span id="p-jester_shoes-3" class="text-amber-200/85">$60</span></div>
+                                </div>
+                            </div>
+
+                            <div id="paycell-white_gem" class="epg-pay-cell flex items-center gap-1.5">
+                                <span class="text-xl leading-none shrink-0 drop-shadow">💎</span>
+                                <div class="text-[9px] leading-tight font-extrabold text-amber-100">
+                                    <div>5 · <span id="p-white_gem-5" class="text-yellow-300">$600</span></div>
+                                    <div>4 · <span id="p-white_gem-4" class="text-yellow-200">$120</span></div>
+                                    <div>3 · <span id="p-white_gem-3" class="text-amber-200/85">$60</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-[8px] sm:text-[9px] font-bold text-center text-amber-100/85 uppercase tracking-wide pt-0.5">
+                        PAGOS DE IZQUIERDA A DERECHA · 5 LÍNEAS ACTIVAS · RECARGAS ACREDITADAS EN 5–10 SEGUNDOS
+                    </div>
+                </div>
+
+                <!-- 2. BANNER FESTIVO SUPERIOR EN PREMIOS ALTOS -->
+                <div id="sensational-banner" class="hidden epg-sensational-banner py-2 px-3 text-center">
+                    <div id="sensational-title" class="epg-sensational-text text-xl sm:text-2xl font-bold uppercase tracking-wide">
+                        SENSATIONAL!
+                    </div>
+                    <div id="sensational-amount" class="font-display text-lg sm:text-xl font-bold text-white drop-shadow">
+                        $0
+                    </div>
+                </div>
+
+                <!-- 3. PANTALLA DE CARRETES 5x3 HD CON INDICADORES DE LÍNEA -->
+                <div class="epg-reels-box flex items-stretch">
+                    <div class="flex flex-col justify-around py-2 px-1 bg-black/40 border-r border-amber-300/35 text-[9px] font-black select-none">
+                        <span class="w-4 h-4 rounded-full bg-pink-500 text-white flex items-center justify-center shadow">4</span>
+                        <span class="w-4 h-4 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center shadow">2</span>
+                        <span class="w-4 h-4 rounded-full bg-emerald-400 text-slate-950 flex items-center justify-center shadow">1</span>
+                        <span class="w-4 h-4 rounded-full bg-cyan-400 text-slate-950 flex items-center justify-center shadow">3</span>
+                        <span class="w-4 h-4 rounded-full bg-purple-400 text-slate-950 flex items-center justify-center shadow">5</span>
+                    </div>
+
+                    <div class="relative flex-1 h-[196px] sm:h-[220px]">
+                        <canvas id="slot-canvas"></canvas>
+                    </div>
+                </div>
+
+                <!-- 4. TEXTO DE ESTADO / GANANCIA DE LÍNEA -->
+                <div class="px-3 pt-2.5 pb-1 text-center min-h-[44px] flex flex-col items-center justify-center">
+                    <div id="slot-status-main" class="font-display text-base sm:text-lg font-bold text-amber-300 uppercase tracking-wide">
+                        ¡BUENA SUERTE!
+                    </div>
+                    <div id="slot-status-sub" class="text-[10px] sm:text-[11px] font-bold text-amber-100/85">
+                        Toca girar o mantén pulsado para Tirada Turbo
+                    </div>
+                </div>
+
+                <!-- 5. LOS 3 BOTONES CENTRALES CIRCULARES -->
+                <div class="px-4 py-2 flex items-center justify-center gap-4 sm:gap-5">
+                    <button type="button" id="btn-coins-panel" title="Monedas por línea, valor de moneda y apuesta" class="epg-control-circle w-12 h-12 sm:w-13 sm:h-13 rounded-full flex items-center justify-center text-xl text-amber-200">
+                        🪙
+                    </button>
+
+                    <button type="button" id="btn-spin" title="Toca para girar o mantén pulsado para Tirada Turbo" class="epg-control-circle w-20 h-20 sm:w-22 sm:h-22 rounded-full relative flex items-center justify-center text-white">
+                        <svg viewBox="0 0 120 120" class="w-full h-full pointer-events-none">
+                            <defs>
+                                <path id="turboArcPath" d="M 18,62 A 42,42 0 1,1 102,62" fill="none" />
+                            </defs>
+                            <text fill="#fef08a" font-size="8.2" font-weight="800" letter-spacing="1.2">
+                                <textPath href="#turboArcPath" startOffset="50%" text-anchor="middle">
+                                    MANTENGA PARA TIRADA TURBO
+                                </textPath>
+                            </text>
+                        </svg>
+                        <span id="spin-arrow-icon" class="absolute text-3xl sm:text-4xl font-black text-white drop-shadow">↻</span>
+                    </button>
+
+                    <button type="button" id="btn-auto-spin" title="Tirar repetidamente (Auto-Giro)" class="epg-control-circle w-12 h-12 sm:w-13 sm:h-13 rounded-full flex flex-col items-center justify-center text-white">
+                        <span id="auto-spin-icon" class="text-lg leading-none">🔁</span>
+                        <span id="auto-spin-badge" class="text-[8px] font-black uppercase text-amber-200 mt-0.5">AUTO</span>
+                    </button>
+                </div>
+
+                <!-- 6. ZONA INFERIOR: TUERCA + MARCA + CRÉDITO Y APUESTA + RÁPIDO -->
+                <div class="px-3 pb-3 pt-1 flex items-end justify-between gap-2">
+                    <div class="flex flex-col items-start gap-1">
+                        <button type="button" id="btn-open-bet-settings" title="Configuración de moneda por línea, valor de moneda y apuesta" class="w-8 h-8 rounded-full bg-white/10 hover:bg-amber-400/25 border border-white/25 flex items-center justify-center text-base text-amber-200 transition">
+                            ⚙️
+                        </button>
+                        <span class="text-[8px] font-extrabold tracking-wider text-amber-100/80 uppercase">
+                            EL PRÓXIMO GANADOR™
+                        </span>
+                    </div>
+
+                    <div class="flex-1 flex items-center justify-center gap-4 text-center">
+                        <div>
+                            <div class="text-[9px] font-black uppercase text-amber-200/80">CRÉDITO</div>
+                            <div id="hud-balance" class="font-display text-sm sm:text-base font-bold text-white">$0</div>
+                        </div>
+                        <div>
+                            <div class="text-[9px] font-black uppercase text-amber-200/80">APUESTA</div>
+                            <div id="hud-current-bet" class="font-display text-sm sm:text-base font-bold text-yellow-300">$50</div>
+                        </div>
+                    </div>
+
+                    <div class="w-8 text-right">
+                        <button type="button" id="btn-quick-plus" title="Subir apuesta rápida" class="w-8 h-8 rounded-full bg-white/10 hover:bg-amber-400/25 border border-white/25 text-yellow-300 font-black text-base flex items-center justify-center transition">
+                            +
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RESUMEN COMPACTO DEL JUGADOR -->
+            <section class="max-w-[454px] mx-auto grid grid-cols-2 gap-2">
+                <div class="rounded-2xl bg-white/10 border border-emerald-300/30 px-3 py-2">
+                    <div class="text-[10px] font-bold uppercase text-emerald-200">Total Premios</div>
+                    <div id="stat-total-prizes" class="font-display text-base font-bold text-emerald-300">$0</div>
+                </div>
+                <div class="rounded-2xl bg-white/10 border border-amber-300/30 px-3 py-2">
+                    <div class="text-[10px] font-bold uppercase text-amber-200">Retiro Realizado</div>
+                    <div id="stat-withdrawn-done" class="font-display text-base font-bold text-amber-300">$0</div>
+                </div>
+            </section>
+
+            <!-- NOTAS IMPORTANTES DEL JUEGO -->
+            <section class="max-w-[454px] mx-auto rounded-2xl bg-black/45 border border-amber-300/30 px-3.5 py-2.5 text-[10.5px] text-amber-100/90 space-y-1">
+                <div class="font-black text-amber-300 uppercase text-[9.5px]">📌 Notas importantes</div>
+                <p>• Este juego es <strong>recreativo para pasar el rato</strong> y disfrutar de la dinámica.</p>
+                <p>• Si vas a apostar y ganar, hazlo siempre <strong>con responsabilidad</strong>.</p>
+                <p>• Hay <strong>combinaciones secretas de secuencias de apuestas</strong> con premios inmediatos desde <strong>$5.000</strong>.</p>
+            </section>
+
+            <!-- CHAT EN TIEMPO REAL DEL JUGADOR CON ADMIN -->
+            <section id="player-chat-section" class="max-w-[454px] mx-auto rounded-2xl bg-white/10 border border-cyan-300/35 p-3 space-y-2.5">
+                <div class="flex items-center justify-between">
+                    <h4 class="font-display text-sm font-bold text-cyan-300">💬 Chat en Vivo con Admin</h4>
+                    <span class="text-[10px] text-white/65">Tiempo real</span>
+                </div>
+                <div id="player-chat-messages" class="space-y-1.5 max-h-40 overflow-y-auto bg-black/45 rounded-xl p-2.5 text-xs"></div>
+                <form id="player-chat-form" class="flex gap-2">
+                    <input id="player-chat-input" type="text" placeholder="Escribe un mensaje al Admin..." class="flex-1 px-3 py-2 rounded-xl bg-slate-950/90 border border-white/20 text-white text-xs placeholder-white/40 focus:outline-none focus:border-cyan-300">
+                    <button type="submit" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-300 to-emerald-300 text-slate-950 font-black text-xs">
+                        Enviar
+                    </button>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL CONFIGURACIÓN DE APUESTA -->
+    <div id="modal-bet-settings" class="hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-sm p-4 flex items-center justify-center overflow-y-auto">
+        <div class="w-full max-w-md rounded-3xl bg-[#1f053d] border-2 border-amber-300 p-5 sm:p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-white/15 pb-3">
+                <h3 class="font-display text-xl font-bold text-yellow-300">⚙️ Configuración de Apuesta</h3>
+                <button type="button" data-close-modal="modal-bet-settings" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold">✕</button>
+            </div>
+
+            <div class="rounded-2xl bg-black/45 border border-white/15 p-3 space-y-1.5">
+                <div class="text-[11px] font-black uppercase text-center text-amber-200">Monedas por Línea (5 Líneas)</div>
+                <div class="flex items-center justify-between gap-3">
+                    <button type="button" id="cfg-coins-minus" class="w-10 h-10 rounded-xl bg-amber-400/20 hover:bg-amber-400/40 border border-amber-300 text-yellow-300 font-black text-xl">−</button>
+                    <div id="cfg-coins-val" class="font-display text-xl font-bold text-white">1</div>
+                    <button type="button" id="cfg-coins-plus" class="w-10 h-10 rounded-xl bg-amber-400/20 hover:bg-amber-400/40 border border-amber-300 text-yellow-300 font-black text-xl">+</button>
+                </div>
+            </div>
+
+            <div class="rounded-2xl bg-black/45 border border-white/15 p-3 space-y-1.5">
+                <div class="text-[11px] font-black uppercase text-center text-cyan-200">Valor de Moneda</div>
+                <div class="flex items-center justify-between gap-3">
+                    <button type="button" id="cfg-coinval-minus" class="w-10 h-10 rounded-xl bg-cyan-400/20 hover:bg-cyan-400/40 border border-cyan-300 text-cyan-200 font-black text-xl">−</button>
+                    <div id="cfg-coinval-val" class="font-display text-xl font-bold text-cyan-300">$10</div>
+                    <button type="button" id="cfg-coinval-plus" class="w-10 h-10 rounded-xl bg-cyan-400/20 hover:bg-cyan-400/40 border border-cyan-300 text-cyan-200 font-black text-xl">+</button>
+                </div>
+            </div>
+
+            <div class="rounded-2xl bg-gradient-to-r from-amber-500/20 to-pink-500/20 border border-amber-300/60 p-3 space-y-1.5">
+                <div class="text-[11px] font-black uppercase text-center text-yellow-200">Total Apostado</div>
+                <div class="flex items-center justify-between gap-3">
+                    <button type="button" id="cfg-total-minus" class="w-10 h-10 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xl">−</button>
+                    <div id="cfg-total-val" class="font-display text-2xl font-bold text-yellow-300">$50</div>
+                    <button type="button" id="cfg-total-plus" class="w-10 h-10 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xl">+</button>
+                </div>
+            </div>
+
+            <div class="rounded-2xl bg-black/45 border border-white/15 p-3 space-y-2.5 text-xs">
+                <div class="flex items-center justify-between font-bold text-amber-100">
+                    <span>🔊 Volumen</span>
+                    <input id="music-volume" type="range" min="0" max="100" value="80" class="w-32 accent-amber-300 cursor-pointer">
+                </div>
+                <div class="flex items-center justify-between font-bold text-cyan-100">
+                    <span>⚡ Tirada Turbo</span>
+                    <button type="button" id="btn-toggle-turbo-modal" class="px-3 py-1 rounded-xl bg-white/15 border border-cyan-300/50 font-black text-xs text-cyan-200">
+                        Desactivado
+                    </button>
+                </div>
+            </div>
+
+            <div class="rounded-2xl bg-black/35 border border-amber-300/25 p-2.5 text-[10.5px] text-amber-100/85 space-y-0.5">
+                <p>📌 Juego recreativo para pasar el rato. Si vas a apostar y ganar, hazlo con responsabilidad.</p>
+            </div>
+
+            <button type="button" data-close-modal="modal-bet-settings" class="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-300 via-orange-400 to-pink-500 text-slate-950 font-black text-sm shadow-lg">
+                ✅ Aplicar y Jugar
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL DE RECARGA -->
+    <div id="modal-recharge" class="hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-sm p-4 flex items-center justify-center overflow-y-auto">
+        <div class="w-full max-w-lg rounded-3xl bg-slate-900 border-2 border-emerald-400/55 p-5 sm:p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between">
+                <h3 class="font-display text-xl sm:text-2xl font-bold text-emerald-300">💳 Recargar Saldo</h3>
+                <button type="button" data-close-modal="modal-recharge" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold">✕</button>
+            </div>
+
+            <div class="rounded-2xl bg-emerald-500/15 border border-emerald-400/40 p-3.5 space-y-1.5 text-xs sm:text-sm">
+                <p class="text-xs text-emerald-100/95">
+                    Mínimo a recargar: <strong>$10.000 COP</strong>. Quienes recarguen <strong>$30.000 COP</strong> acceden a mayores premios.
+                </p>
+                <p class="text-[11px] text-amber-100/85">
+                    Recuerda que es un juego recreativo para pasar el rato; si vas a apostar y ganar, hazlo con responsabilidad.
+                </p>
+            </div>
+
+            <div class="rounded-2xl bg-amber-400/15 border border-amber-300/50 px-3.5 py-2.5 text-xs font-extrabold text-amber-200">
+                ⚡ Cuando aprueben tu recarga, te llega sola en unos 5 a 10 segundos sin recargar la página.
+            </div>
+
+            <form id="recharge-form" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-amber-200 mb-1.5">Valor a recargar (mínimo $10.000):</label>
+                    <div class="grid grid-cols-4 gap-2 mb-2">
+                        <button type="button" data-recharge-preset="10000" class="py-2 rounded-xl bg-white/10 hover:bg-emerald-400/25 border border-white/15 text-xs font-extrabold text-white">$10.000</button>
+                        <button type="button" data-recharge-preset="30000" class="py-2 rounded-xl bg-amber-400/25 hover:bg-amber-400/40 border border-amber-300/60 text-xs font-black text-yellow-200">$30.000 🔥</button>
+                        <button type="button" data-recharge-preset="50000" class="py-2 rounded-xl bg-white/10 hover:bg-emerald-400/25 border border-white/15 text-xs font-extrabold text-white">$50.000</button>
+                        <button type="button" data-recharge-preset="100000" class="py-2 rounded-xl bg-white/10 hover:bg-emerald-400/25 border border-white/15 text-xs font-extrabold text-white">$100.000</button>
+                    </div>
+                    <input id="recharge-amount" type="number" min="10000" step="1000" value="30000" required class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/20 text-white font-bold text-sm">
+                </div>
+
+                <div id="recharge-feedback" class="hidden rounded-xl px-3.5 py-2 text-xs font-bold"></div>
+
+                <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
+                    <button type="submit" class="flex-1 py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-300 hover:brightness-105 text-slate-950 font-black text-xs sm:text-sm shadow-lg transition">
+                        ✅ Registrar Solicitud
+                    </button>
+                    <a id="btn-wa-receipt" href="#" target="_blank" rel="noopener noreferrer" class="flex-1 py-3 px-4 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 hover:brightness-105 text-white font-black text-xs sm:text-sm text-center shadow-lg transition flex items-center justify-center gap-1.5">
+                        <span>📲 Enviar Comprobante WhatsApp</span>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE RETIRO -->
+    <div id="modal-withdraw" class="hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-sm p-4 flex items-center justify-center overflow-y-auto">
+        <div class="w-full max-w-lg rounded-3xl bg-slate-900 border-2 border-amber-400/55 p-5 sm:p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between">
+                <h3 class="font-display text-xl sm:text-2xl font-bold text-amber-300">💸 Solicitar Retiro (70% / 30%)</h3>
+                <button type="button" data-close-modal="modal-withdraw" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold">✕</button>
+            </div>
+
+            <div class="rounded-2xl bg-amber-400/10 border border-amber-300/35 p-3.5 text-xs text-amber-50/90 space-y-1">
+                <p>En cada retiro de <strong>$30.000</strong> a <strong>$100.000 COP</strong>, recibes el <strong class="text-emerald-300">70% neto</strong> y la casa retiene el <strong class="text-pink-300">30%</strong>.</p>
+                <p class="text-[11px] text-amber-200/80">📌 Juego recreativo para pasar el rato; apuesta y gana con responsabilidad.</p>
+            </div>
+
+            <form id="withdraw-form" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-amber-200 mb-1.5">Monto a retirar ($30.000 a $100.000):</label>
+                    <div class="grid grid-cols-3 gap-2 mb-2">
+                        <button type="button" data-withdraw-preset="30000" class="py-2 rounded-xl bg-white/10 hover:bg-amber-400/25 border border-white/15 text-xs font-extrabold text-white">$30.000</button>
+                        <button type="button" data-withdraw-preset="50000" class="py-2 rounded-xl bg-white/10 hover:bg-amber-400/25 border border-white/15 text-xs font-extrabold text-white">$50.000</button>
+                        <button type="button" data-withdraw-preset="100000" class="py-2 rounded-xl bg-white/10 hover:bg-amber-400/25 border border-white/15 text-xs font-extrabold text-white">$100.000</button>
+                    </div>
+                    <input id="withdraw-amount" type="number" min="30000" max="100000" step="1000" value="30000" required class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/20 text-white font-bold text-sm">
+                </div>
+
+                <div>
+                    <label for="withdraw-account" class="block text-xs font-bold text-amber-200 mb-1">Cuenta Nequi o Bancaria Destino *</label>
+                    <input id="withdraw-account" type="text" required placeholder="Ej: Nequi 3100000000" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/20 text-white text-sm">
+                </div>
+
+                <div class="rounded-2xl bg-black/45 border border-white/15 p-3.5 space-y-1.5 text-xs">
+                    <div class="flex justify-between text-white/80">
+                        <span>Solicitado:</span>
+                        <span id="wd-calc-gross" class="font-bold text-white">$30.000</span>
+                    </div>
+                    <div class="flex justify-between text-pink-200">
+                        <span>Casa (30%):</span>
+                        <span id="wd-calc-house" class="font-bold">-$9.000</span>
+                    </div>
+                    <div class="border-t border-white/10 pt-1.5 flex justify-between text-sm font-black text-emerald-300">
+                        <span>Recibes (70%):</span>
+                        <span id="wd-calc-net">$21.000</span>
+                    </div>
+                </div>
+
+                <div id="withdraw-feedback" class="hidden rounded-xl px-3.5 py-2 text-xs font-bold"></div>
+
+                <button type="submit" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-amber-300 via-orange-400 to-pink-500 hover:brightness-105 text-slate-950 font-black text-sm shadow-lg transition">
+                    💸 Confirmar Retiro
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL PANEL ADMINISTRADOR (CLAVE 1980) -->
+    <div id="modal-admin" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md p-3 sm:p-5 flex items-center justify-center overflow-y-auto">
+        <div class="w-full max-w-6xl rounded-3xl bg-slate-950 border-2 border-amber-300/50 p-4 sm:p-6 space-y-5 max-h-[92vh] overflow-y-auto shadow-2xl">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+                <div>
+                    <h3 class="font-display text-xl sm:text-2xl font-bold text-amber-300">🔐 Panel de Administración — EL PRÓXIMO GANADOR</h3>
+                    <p class="text-xs text-white/65">Barra de ingresos, entradas al link y al juego, chat en vivo, recargas, retiros 70/30 y usuarios en línea.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" id="btn-adm-clear-history" class="px-3 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/35 border border-rose-400/45 text-rose-200 font-extrabold text-xs">
+                        🧹 Limpiar Historial
+                    </button>
+                    <button type="button" data-close-modal="modal-admin" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold">✕</button>
+                </div>
+            </div>
+
+            <div id="admin-lock-view" class="max-w-sm mx-auto py-6 space-y-4 text-center">
+                <div class="text-4xl">🛡️</div>
+                <h4 class="font-display text-2xl font-bold text-white">Acceso Restringido</h4>
+                <p class="text-xs text-white/70">Ingresa tu clave de administrador para desbloquear el control de la sala.</p>
+                <form id="admin-pin-form" class="space-y-3">
+                    <input id="admin-pin-input" type="password" required placeholder="Ingresa la clave" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-amber-300/45 text-white text-center text-sm tracking-widest focus:outline-none focus:border-amber-300">
+                    <div id="admin-pin-error" class="hidden text-xs font-bold text-rose-300">Clave incorrecta. Intenta de nuevo.</div>
+                    <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-300 to-orange-400 text-slate-950 font-black text-sm">
+                        Entrar a Acceso Restringido
+                    </button>
+                </form>
+            </div>
+
+            <div id="admin-dashboard-view" class="hidden space-y-5">
+                <!-- BARRA DE INGRESOS Y DETALLE DE QUIÉN INGRESÓ (CELULAR O PORTÁTIL) -->
+                <div class="rounded-2xl bg-gradient-to-r from-indigo-950/90 via-purple-950/80 to-slate-900 border border-cyan-400/40 p-4 space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h4 class="font-display text-base font-bold text-cyan-300">📊 Barra de Ingresos al Link y al Juego</h4>
+                        <div class="flex items-center gap-2">
+                            <span id="adm-last-visit-time" class="text-[11px] font-bold text-amber-200/85">Última visita: Sin registro</span>
+                            <button type="button" id="btn-adm-clear-entries" class="px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/35 border border-rose-400/40 text-rose-200 font-extrabold text-[11px]">
+                                🧹 Limpiar Ingresos
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Barra visual proporcional de distribución de ingresos -->
+                    <div class="w-full h-3.5 rounded-full bg-black/60 border border-white/15 overflow-hidden flex">
+                        <div id="adm-bar-mobile" class="h-full bg-cyan-400 transition-all duration-300" style="width: 0%" title="Celular"></div>
+                        <div id="adm-bar-desktop" class="h-full bg-amber-400 transition-all duration-300" style="width: 0%" title="Portátil / PC"></div>
+                        <div id="adm-bar-entries" class="h-full bg-emerald-400 transition-all duration-300" style="width: 0%" title="Entradas a jugar"></div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-4 text-[11px] font-bold">
+                        <span class="text-cyan-300">📱 Celular: <span id="adm-dev-mobile">0</span></span>
+                        <span class="text-yellow-300">💻 Portátil / PC: <span id="adm-dev-desktop">0</span></span>
+                        <span class="text-emerald-300">🎮 Entradas a jugar: <span id="adm-dev-entries-total">0</span></span>
+                    </div>
+
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+                        <div class="rounded-xl bg-black/45 border border-cyan-300/25 p-3">
+                            <div class="text-[11px] text-cyan-100/75">Clics / Cargas al Link</div>
+                            <div id="adm-t-link-visits" class="font-display text-xl font-bold text-cyan-300 mt-0.5">0</div>
+                        </div>
+                        <div class="rounded-xl bg-black/45 border border-amber-300/25 p-3">
+                            <div class="text-[11px] text-amber-100/75">Dispositivos Únicos</div>
+                            <div id="adm-t-unique-visitors" class="font-display text-xl font-bold text-yellow-300 mt-0.5">0</div>
+                        </div>
+                        <div class="rounded-xl bg-black/45 border border-emerald-300/25 p-3">
+                            <div class="text-[11px] text-emerald-100/75">Entradas Modo Demo</div>
+                            <div id="adm-t-demo-entries" class="font-display text-xl font-bold text-emerald-300 mt-0.5">0</div>
+                        </div>
+                        <div class="rounded-xl bg-black/45 border border-pink-300/25 p-3">
+                            <div class="text-[11px] text-pink-100/75">Entradas con Nick</div>
+                            <div id="adm-t-real-entries" class="font-display text-xl font-bold text-pink-300 mt-0.5">0</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5 pt-1">
+                        <div class="text-xs font-extrabold text-amber-200">🕵️ Detalle de cada ingreso (qué hizo y desde qué equipo entró):</div>
+                        <div id="adm-entry-logs-list" class="space-y-1.5 max-h-48 overflow-y-auto text-xs"></div>
+                    </div>
+                </div>
+
+                <!-- 10 COMBINACIONES SECRETAS (EXCLUSIVO ADMIN) -->
+                <div class="rounded-2xl bg-gradient-to-r from-amber-950/70 via-fuchsia-950/60 to-slate-900 border border-amber-300/45 p-4 space-y-2.5">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h4 class="font-display text-base font-bold text-yellow-300">🎯 10 Combinaciones Secretas de Secuencia de Apuestas (Solo Admin)</h4>
+                        <span class="text-[10.5px] font-extrabold text-emerald-300">Premios de $5.000 a $20.000 de un solo golpe</span>
+                    </div>
+                    <p class="text-[11px] text-amber-100/80">
+                        Si un jugador ejecuta estas secuencias consecutivas de apuestas, el sistema activa el premio inmediato al instante (sin mostrar estas reglas en la pantalla del jugador):
+                    </p>
+                    <div id="adm-secret-combos-list" class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs"></div>
+                </div>
+
+                <!-- CHAT EN TIEMPO REAL DEL ADMIN CON USUARIOS -->
+                <div class="rounded-2xl bg-white/5 border border-cyan-400/35 p-4 space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h4 class="font-display text-base font-bold text-cyan-300">💬 Chat en Tiempo Real con Jugadores</h4>
+                        <div class="flex items-center gap-2">
+                            <select id="adm-chat-target" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-white/20 text-white text-xs font-bold">
+                                <option value="all">Sala General / Todos</option>
+                            </select>
+                            <button type="button" id="btn-adm-clear-chat" class="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/35 border border-rose-400/40 text-rose-200 font-extrabold text-xs">
+                                🧹 Limpiar Chat
+                            </button>
+                        </div>
+                    </div>
+                    <div id="adm-chat-messages" class="space-y-1.5 max-h-48 overflow-y-auto bg-black/45 rounded-xl p-3 text-xs"></div>
+                    <form id="adm-chat-form" class="flex gap-2">
+                        <input id="adm-chat-input" type="text" placeholder="Escribe un mensaje para el jugador..." class="flex-1 px-3.5 py-2 rounded-xl bg-slate-900 border border-white/20 text-white text-xs placeholder-white/40 focus:outline-none focus:border-cyan-300">
+                        <button type="submit" class="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-300 to-emerald-300 text-slate-950 font-black text-xs">
+                            Enviar Mensaje
+                        </button>
+                    </form>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+                    <div class="rounded-2xl bg-white/5 border border-white/10 p-3">
+                        <div class="text-[11px] text-white/65">Usuarios Diarios</div>
+                        <div id="adm-m-daily" class="font-display text-xl font-bold text-cyan-300 mt-0.5">0</div>
+                    </div>
+                    <div class="rounded-2xl bg-white/5 border border-white/10 p-3">
+                        <div class="text-[11px] text-white/65">Usuarios Activos</div>
+                        <div id="adm-m-active" class="font-display text-xl font-bold text-emerald-300 mt-0.5">0</div>
+                    </div>
+                    <div class="rounded-2xl bg-white/5 border border-white/10 p-3">
+                        <div class="text-[11px] text-white/65">Usuarios Semanales</div>
+                        <div id="adm-m-weekly" class="font-display text-xl font-bold text-pink-300 mt-0.5">0</div>
+                    </div>
+                    <div class="rounded-2xl bg-white/5 border border-white/10 p-3">
+                        <div class="text-[11px] text-white/65">Total Apostado General</div>
+                        <div id="adm-m-wagered" class="font-display text-lg font-bold text-yellow-300 mt-0.5">$0</div>
+                    </div>
+                    <div class="rounded-2xl bg-white/5 border border-white/10 p-3">
+                        <div class="text-[11px] text-white/65">Premios Pagados</div>
+                        <div id="adm-m-won" class="font-display text-lg font-bold text-emerald-300 mt-0.5">$0</div>
+                    </div>
+                    <div class="rounded-2xl bg-gradient-to-br from-pink-500/25 to-amber-400/20 border border-amber-300/45 p-3">
+                        <div class="text-[11px] font-bold text-amber-200">Ganancia Casa</div>
+                        <div id="adm-m-house" class="font-display text-lg font-bold text-amber-300 mt-0.5">$0</div>
+                    </div>
+                </div>
+
+                <div class="rounded-2xl bg-white/5 border border-emerald-400/30 p-4 space-y-2.5">
+                    <h4 class="font-display text-base font-bold text-emerald-300">Usuarios en Línea y Solicitudes Activas (Recarga / Retiro)</h4>
+                    <div id="adm-online-requests-list" class="space-y-2 max-h-56 overflow-y-auto text-xs"></div>
+                </div>
+
+                <div class="rounded-2xl bg-white/5 border border-cyan-400/30 p-4 space-y-2.5">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h4 class="font-display text-base font-bold text-cyan-200">💳 Solicitudes de Recargas</h4>
+                        <button type="button" id="btn-adm-clear-recharges" class="px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/35 border border-rose-400/40 text-rose-200 font-extrabold text-xs">
+                            🧹 Limpiar Recargas
+                        </button>
+                    </div>
+                    <div id="adm-recharges-list" class="space-y-2 max-h-60 overflow-y-auto text-xs"></div>
+                </div>
+
+                <div class="rounded-2xl bg-white/5 border border-amber-400/30 p-4 space-y-2.5">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h4 class="font-display text-base font-bold text-amber-300">💸 Solicitudes de Retiro (70% Jugador / 30% Casa)</h4>
+                        <button type="button" id="btn-adm-clear-withdrawals" class="px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/35 border border-rose-400/40 text-rose-200 font-extrabold text-xs">
+                            🧹 Limpiar Retiros
+                        </button>
+                    </div>
+                    <div id="adm-withdrawals-list" class="space-y-2 max-h-60 overflow-y-auto text-xs"></div>
+                </div>
+
+                <div class="rounded-2xl bg-white/5 border border-pink-400/30 p-4 space-y-2.5">
+                    <h4 class="font-display text-base font-bold text-pink-200">📊 Total Apostado y Balance de Pérdida por Jugador</h4>
+                    <div id="adm-users-list" class="space-y-2.5 max-h-64 overflow-y-auto text-xs"></div>
+                </div>
+
+                <div class="rounded-2xl bg-white/5 border border-white/15 p-4 space-y-3 text-xs">
+                    <h4 class="font-display text-base font-bold text-yellow-200">⚙️ Configuración General de Sala y Banca</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div>
+                            <label for="adm-cfg-dburl" class="block font-bold text-amber-200 mb-1">URL Firebase Realtime Database</label>
+                            <input id="adm-cfg-dburl" type="url" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/20 text-white">
+                        </div>
+                        <div>
+                            <label for="adm-cfg-room" class="block font-bold text-amber-200 mb-1">Código de Sala</label>
+                            <input id="adm-cfg-room" type="text" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/20 text-white">
+                        </div>
+                        <div>
+                            <label for="adm-cfg-nequi" class="block font-bold text-amber-200 mb-1">Número Nequi Recargas</label>
+                            <input id="adm-cfg-nequi" type="text" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/20 text-white">
+                        </div>
+                        <div>
+                            <label for="adm-cfg-wa-admin" class="block font-bold text-amber-200 mb-1">WhatsApp del Admin</label>
+                            <input id="adm-cfg-wa-admin" type="text" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/20 text-white">
+                        </div>
+                        <div>
+                            <label for="adm-cfg-pin" class="block font-bold text-amber-200 mb-1">Clave del Admin</label>
+                            <input id="adm-cfg-pin" type="password" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/20 text-white">
+                        </div>
+                    </div>
+                    <p id="adm-online-conn-detail" class="text-[11px] text-cyan-200/85"></p>
+                    <div class="flex flex-wrap gap-2 pt-1">
+                        <button type="button" id="btn-adm-save-cfg" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-300 text-slate-950 font-black text-xs">
+                            💾 Guardar Configuración
+                        </button>
+                        <button type="button" id="btn-adm-sync-now" class="px-4 py-2.5 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-black text-xs">
+                            🔄 Sincronizar Sala Ahora
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2 max-w-xs w-full pointer-events-none"></div>
+
+    <script>
+        const DEFAULT_CLOUD_CONFIG = {
+            dbUrl: "https://el-proximo-ganador-default-rtdb.firebaseio.com",
+            roomCode: "MESA_VIP_01",
+            nequiNumber: "3106047749",
+            whatsappAdmin: "573106047749"
+        };
+
+        (function () {
+            "use strict";
+
+            const PAYLINES_COUNT = 5;
+            const COINS_PER_LINE_OPTIONS = [1, 2, 3, 4, 5, 10];
+            const COIN_VALUE_OPTIONS = [10, 20, 40, 100, 200, 300, 600, 1000];
+            const BET_STEPS = [50, 100, 200, 500, 1000, 1500, 3000, 5000];
+
+            const DEMO_START_BALANCE = 50000;
+            const MIN_RECHARGE = 10000;
+            const PROMO_RECHARGE_30K = 30000;
+            const MIN_WITHDRAW = 30000;
+            const MAX_WITHDRAW = 100000;
+            const HOUSE_RETENTION_SHARE = 0.30;
+            const DEFAULT_ADMIN_PIN = "1980";
+
+            // 10 COMBINACIONES SECRETAS DE SECUENCIA DE APUESTAS ($5.000 hasta $20.000)
+            const SECRET_BET_COMBINATIONS = [
+                {
+                    id: "combo_1_escalera_completa",
+                    name: "1. Escalera Completa (50 → 5000)",
+                    seq: [50, 100, 200, 500, 1000, 1500, 3000, 5000],
+                    payout: 20000,
+                    difficulty: "Máxima"
+                },
+                {
+                    id: "combo_2_salto_relampago",
+                    name: "2. Salto Relámpago",
+                    seq: [50, 5000, 200, 3000],
+                    payout: 15000,
+                    difficulty: "Alta"
+                },
+                {
+                    id: "combo_3_descendente_total",
+                    name: "3. Cascada Descendente",
+                    seq: [5000, 3000, 1500, 1000, 500, 200, 100, 50],
+                    payout: 15000,
+                    difficulty: "Alta"
+                },
+                {
+                    id: "combo_4_doble_pulso_extremo",
+                    name: "4. Doble Pulso Extremo",
+                    seq: [100, 5000, 100, 5000],
+                    payout: 12000,
+                    difficulty: "Media-Alta"
+                },
+                {
+                    id: "combo_5_ascenso_media",
+                    name: "5. Ascenso de Media",
+                    seq: [100, 200, 500, 1000, 1500],
+                    payout: 10000,
+                    difficulty: "Media"
+                },
+                {
+                    id: "combo_6_caida_rapida",
+                    name: "6. Caída Rápida",
+                    seq: [3000, 1500, 500, 100],
+                    payout: 8000,
+                    difficulty: "Media"
+                },
+                {
+                    id: "combo_7_chispa_alta",
+                    name: "7. Chispa Alta",
+                    seq: [50, 1500, 50, 3000],
+                    payout: 8000,
+                    difficulty: "Media"
+                },
+                {
+                    id: "combo_8_ritmo_1000",
+                    name: "8. Ritmo de Miles",
+                    seq: [1000, 1000, 3000, 500],
+                    payout: 7000,
+                    difficulty: "Accesible"
+                },
+                {
+                    id: "combo_9_tanteo_1500",
+                    name: "9. Tanteo al 1500",
+                    seq: [50, 200, 1500, 200],
+                    payout: 6000,
+                    difficulty: "Accesible"
+                },
+                {
+                    id: "combo_10_inicio_clasico",
+                    name: "10. Inicio Clásico",
+                    seq: [50, 100, 200, 500],
+                    payout: 5000,
+                    difficulty: "Base"
+                }
+            ];
+
+            const SYMBOLS = [
+                { id: "joker", glyph: "🤡", label: "Payaso", accent: "#ff2a85", glow: "rgba(255, 42, 133, 0.55)", weight: 9, m5: 200, m4: 40, m3: 4, mult: 1.95 },
+                { id: "crown", glyph: "👑", label: "Corona Bonus", accent: "#ffd426", glow: "rgba(255, 212, 38, 0.65)", weight: 7, m5: 100, m4: 15, m3: 3, mult: 2.30 },
+                { id: "guitar", glyph: "🎸", label: "Guitarra", accent: "#fb923c", glow: "rgba(251, 146, 60, 0.55)", weight: 11, m5: 60, m4: 12, m3: 3, mult: 1.65 },
+                { id: "pins", glyph: "🎳", label: "Pinos", accent: "#f8fafc", glow: "rgba(248, 250, 252, 0.50)", weight: 13, m5: 60, m4: 12, m3: 3, mult: 1.35 },
+                { id: "jester_shoes", glyph: "👟", label: "Bufones", accent: "#c084fc", glow: "rgba(192, 132, 252, 0.55)", weight: 15, m5: 12, m4: 3, m3: 1.2, mult: 0.85 },
+                { id: "red_gem", glyph: "♦️", label: "Diam. Rojo", accent: "#f43f5e", glow: "rgba(244, 63, 94, 0.58)", weight: 15, m5: 12, m4: 3, m3: 1.2, mult: 1.15 },
+                { id: "blue_gem", glyph: "💠", label: "Diam. Azul", accent: "#38bdf8", glow: "rgba(56, 189, 248, 0.58)", weight: 15, m5: 12, m4: 2.4, m3: 1.2, mult: 1.05 },
+                { id: "white_gem", glyph: "💎", label: "Diam. Blanco", accent: "#e2e8f0", glow: "rgba(226, 232, 240, 0.58)", weight: 15, m5: 12, m4: 2.4, m3: 1.2, mult: 0.95 }
+            ];
+
+            const PAYLINE_PATHS = [
+                { id: 1, color: "#34d399", rows: [1, 1, 1, 1, 1] },
+                { id: 2, color: "#ffd426", rows: [0, 0, 0, 0, 0] },
+                { id: 3, color: "#00e5ff", rows: [2, 2, 2, 2, 2] },
+                { id: 4, color: "#ff2a85", rows: [0, 1, 2, 1, 0] },
+                { id: 5, color: "#c084fc", rows: [2, 1, 0, 1, 2] }
+            ];
+
+            const COLS = 5;
+            const ROWS = 3;
+
+            function formatMoney(val) {
+                const n = Math.round(Number(val) || 0);
+                return "$" + n.toLocaleString("es-CO");
+            }
+
+            function formatTimeStamp(ts) {
+                if (!ts) return "Sin hora";
+                try {
+                    const d = new Date(Number(ts));
+                    return d.toLocaleString("es-CO", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit"
+                    });
+                } catch (_) {
+                    return "";
+                }
+            }
+
+            function cleanPhoneDigits(phone) {
+                return String(phone || "").replace(/\D+/g, "");
+            }
+
+            function normalizeDbUrl(urlVal) {
+                const cleaned = String(urlVal || "").trim().replace(/\/+$/, "");
+                if (!cleaned || cleaned.toLowerCase().includes("tu-proyecto")) {
+                    return DEFAULT_CLOUD_CONFIG.dbUrl;
+                }
+                return cleaned;
+            }
+
+            function detectDeviceInfo() {
+                const ua = String(navigator.userAgent || "");
+                const isMobileUa = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+                const isSmallScreen = typeof window !== "undefined" && window.innerWidth < 768;
+                const deviceType = (isMobileUa || isSmallScreen) ? "Celular" : "Portátil / PC";
+
+                let os = "Sistema";
+                if (/Android/i.test(ua)) os = "Android";
+                else if (/iPhone|iPad|iPod/i.test(ua)) os = "iOS";
+                else if (/Windows/i.test(ua)) os = "Windows";
+                else if (/Mac OS X/i.test(ua)) os = "macOS";
+                else if (/Linux/i.test(ua)) os = "Linux";
+
+                let browser = "Navegador";
+                if (/Edg\//i.test(ua)) browser = "Edge";
+                else if (/OPR\//i.test(ua) || /Opera/i.test(ua)) browser = "Opera";
+                else if (/Chrome\//i.test(ua) && !/Edg\//i.test(ua)) browser = "Chrome";
+                else if (/Safari\//i.test(ua) && !/Chrome\//i.test(ua)) browser = "Safari";
+                else if (/Firefox\//i.test(ua)) browser = "Firefox";
+
+                return { deviceType, os, browser };
+            }
+
+            function notifyToast(message, type = "info") {
+                try {
+                    const container = document.getElementById("toast-container");
+                    if (!container) return;
+                    const palette = {
+                        success: "bg-emerald-500 text-slate-950 border-emerald-200",
+                        error: "bg-rose-600 text-white border-rose-300",
+                        info: "bg-slate-900/95 text-amber-100 border-amber-300/40"
+                    };
+                    const el = document.createElement("div");
+                    el.className = `pointer-events-auto rounded-2xl border px-4 py-3 text-xs font-extrabold shadow-xl transition transform ${palette[type] || palette.info}`;
+                    el.textContent = message;
+                    container.appendChild(el);
+                    setTimeout(() => {
+                        el.style.opacity = "0";
+                        el.style.transform = "translateY(8px)";
+                        setTimeout(() => el.remove(), 220);
+                    }, 3400);
+                } catch (_) {}
+            }
+
+            // ==================== AUDIO CON TU PISTA PERSONALIZADA ====================
+            class CustomTrackAudio {
+                constructor() {
+                    this.audioEl = document.getElementById("custom-bg-music");
+                    this.enabled = true;
+                    this.volume = 0.80;
+                    if (this.audioEl) {
+                        this.audioEl.volume = this.volume;
+                    }
+                }
+
+                playTrack() {
+                    if (!this.enabled || !this.audioEl) return;
+                    this.audioEl.volume = this.volume;
+                    const p = this.audioEl.play();
+                    if (p && typeof p.catch === "function") {
+                        p.catch(() => {});
+                    }
+                }
+
+                pauseTrack() {
+                    if (!this.audioEl) return;
+                    this.audioEl.pause();
+                }
+
+                toggleEnabled() {
+                    this.enabled = !this.enabled;
+                    if (this.enabled) {
+                        this.playTrack();
+                    } else {
+                        this.pauseTrack();
+                    }
+                    this.syncUI();
+                }
+
+                setVolume(val) {
+                    this.volume = Math.max(0, Math.min(1, Number(val) / 100));
+                    if (this.audioEl) {
+                        this.audioEl.volume = this.volume;
+                    }
+                }
+
+                syncUI() {
+                    const icon = document.getElementById("music-icon");
+                    const label = document.getElementById("music-label");
+                    if (icon) icon.textContent = this.enabled ? "🎶" : "🔇";
+                    if (label) label.textContent = this.enabled ? "Música: ON" : "Música: OFF";
+                }
+            }
+
+            const trackAudio = new CustomTrackAudio();
+
+            // ==================== ESTADO, TRÁFICO, CHAT Y PERSISTENCIA ====================
+            function getRoomStorageKey(roomCode) {
+                return `EL_PROXIMO_GANADOR_V1_${String(roomCode || DEFAULT_CLOUD_CONFIG.roomCode).trim()}`;
+            }
+
+            function getOrCreateVisitorId() {
+                try {
+                    const key = "EPG_VISITOR_UID";
+                    let vid = localStorage.getItem(key);
+                    if (!vid) {
+                        vid = "vis_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+                        localStorage.setItem(key, vid);
+                    }
+                    return vid;
+                } catch (_) {
+                    return "vis_temp_" + Date.now();
+                }
+            }
+
+            function createDefaultState() {
+                return {
+                    settings: {
+                        dbUrl: DEFAULT_CLOUD_CONFIG.dbUrl,
+                        roomCode: DEFAULT_CLOUD_CONFIG.roomCode,
+                        nequiNumber: DEFAULT_CLOUD_CONFIG.nequiNumber,
+                        whatsappAdmin: DEFAULT_CLOUD_CONFIG.whatsappAdmin,
+                        adminPin: DEFAULT_ADMIN_PIN,
+                        totalWagered: 0,
+                        totalWon: 0,
+                        totalPaidOutNet: 0,
+                        totalHouseRetained: 0,
+                        updatedAt: Date.now()
+                    },
+                    traffic: {
+                        totalLinkVisits: 0,
+                        uniqueVisitorIds: [],
+                        demoEntries: 0,
+                        realEntries: 0,
+                        mobileCount: 0,
+                        desktopCount: 0,
+                        lastVisitAt: 0,
+                        entryLogs: []
+                    },
+                    chatMessages: [],
+                    users: {},
+                    rechargeRequests: [],
+                    withdrawalRequests: []
+                };
+            }
+
+            function loadInitialState() {
+                const fallback = createDefaultState();
+                try {
+                    const savedRoom = localStorage.getItem("EL_PROXIMO_GANADOR_ACTIVE_ROOM") || DEFAULT_CLOUD_CONFIG.roomCode;
+                    const raw = localStorage.getItem(getRoomStorageKey(savedRoom));
+                    if (!raw) return fallback;
+                    const parsed = JSON.parse(raw);
+                    const mergedSettings = { ...fallback.settings, ...(parsed.settings || {}) };
+                    mergedSettings.dbUrl = normalizeDbUrl(mergedSettings.dbUrl);
+                    const mergedTraffic = { ...fallback.traffic, ...(parsed.traffic || {}) };
+                    mergedTraffic.uniqueVisitorIds = Array.isArray(mergedTraffic.uniqueVisitorIds) ? mergedTraffic.uniqueVisitorIds : [];
+                    mergedTraffic.entryLogs = Array.isArray(mergedTraffic.entryLogs) ? mergedTraffic.entryLogs : [];
+                    return {
+                        settings: mergedSettings,
+                        traffic: mergedTraffic,
+                        chatMessages: Array.isArray(parsed.chatMessages) ? parsed.chatMessages : [],
+                        users: parsed.users && typeof parsed.users === "object" ? parsed.users : {},
+                        rechargeRequests: Array.isArray(parsed.rechargeRequests) ? parsed.rechargeRequests : [],
+                        withdrawalRequests: Array.isArray(parsed.withdrawalRequests) ? parsed.withdrawalRequests : []
+                    };
+                } catch (_) {
+                    return fallback;
+                }
+            }
+
+            let state = loadInitialState();
+            let activeMode = null;
+            let activeUserId = null;
+            let demoBalance = DEMO_START_BALANCE;
+            let demoTotalPrizes = 0;
+            let demoBetHistory = [];
+
+            let coinsPerLine = 1;
+            let coinValue = 10;
+            let currentBet = PAYLINES_COUNT * coinsPerLine * coinValue;
+            let turboMode = false;
+            let autoSpinActive = false;
+            let autoSpinTimer = null;
+            let holdTurboTimer = null;
+
+            let isSpinning = false;
+            let isSyncingNow = false;
+            let adminUnlocked = false;
+            let remoteConnected = false;
+
+            let winParticles = [];
+            let particleRafId = null;
+
+            function appendEntryLog(entry) {
+                if (!state.traffic) state.traffic = createDefaultState().traffic;
+                if (!Array.isArray(state.traffic.entryLogs)) state.traffic.entryLogs = [];
+                state.traffic.entryLogs.unshift(entry);
+                if (state.traffic.entryLogs.length > 80) {
+                    state.traffic.entryLogs = state.traffic.entryLogs.slice(0, 80);
+                }
+            }
+
+            function recordLinkVisit() {
+                if (!state.traffic) {
+                    state.traffic = createDefaultState().traffic;
+                }
+                const vid = getOrCreateVisitorId();
+                const dev = detectDeviceInfo();
+                const uniqueSet = new Set(Array.isArray(state.traffic.uniqueVisitorIds) ? state.traffic.uniqueVisitorIds : []);
+                uniqueSet.add(vid);
+                state.traffic.uniqueVisitorIds = Array.from(uniqueSet);
+                state.traffic.totalLinkVisits = (Number(state.traffic.totalLinkVisits) || 0) + 1;
+                if (dev.deviceType === "Celular") {
+                    state.traffic.mobileCount = (Number(state.traffic.mobileCount) || 0) + 1;
+                } else {
+                    state.traffic.desktopCount = (Number(state.traffic.desktopCount) || 0) + 1;
+                }
+                state.traffic.lastVisitAt = Date.now();
+                appendEntryLog({
+                    id: `log_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                    visitorId: vid,
+                    action: "Ingresó al link",
+                    userLabel: "Visitante en enlace",
+                    whatsapp: "",
+                    deviceType: dev.deviceType,
+                    os: dev.os,
+                    browser: dev.browser,
+                    ts: Date.now()
+                });
+                writeLocalOnly();
+            }
+
+            function recordGameEntry(mode, userObj = null) {
+                if (!state.traffic) {
+                    state.traffic = createDefaultState().traffic;
+                }
+                const vid = getOrCreateVisitorId();
+                const dev = detectDeviceInfo();
+                if (mode === "demo") {
+                    state.traffic.demoEntries = (Number(state.traffic.demoEntries) || 0) + 1;
+                    appendEntryLog({
+                        id: `log_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                        visitorId: vid,
+                        action: "Entró a jugar (Modo Demo)",
+                        userLabel: "Jugador Demo",
+                        whatsapp: "",
+                        deviceType: dev.deviceType,
+                        os: dev.os,
+                        browser: dev.browser,
+                        ts: Date.now()
+                    });
+                } else if (mode === "real") {
+                    state.traffic.realEntries = (Number(state.traffic.realEntries) || 0) + 1;
+                    appendEntryLog({
+                        id: `log_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                        visitorId: vid,
+                        action: "Entró a jugar (Con Nick)",
+                        userLabel: userObj ? userObj.nick : "Jugador",
+                        whatsapp: userObj ? userObj.whatsapp : "",
+                        deviceType: dev.deviceType,
+                        os: dev.os,
+                        browser: dev.browser,
+                        ts: Date.now()
+                    });
+                }
+            }
+
+            function syncBetFromCoins() {
+                currentBet = Math.max(50, Math.min(5000, PAYLINES_COUNT * coinsPerLine * coinValue));
+            }
+
+            function setTotalBetDirectly(targetBet) {
+                const clamped = Math.max(50, Math.min(5000, Math.round(targetBet / 50) * 50));
+                currentBet = clamped;
+                const perLine = clamped / PAYLINES_COUNT;
+                let bestCoins = 1;
+                let bestVal = perLine;
+                for (const c of COINS_PER_LINE_OPTIONS) {
+                    if (perLine % c === 0 && COIN_VALUE_OPTIONS.includes(perLine / c)) {
+                        bestCoins = c;
+                        bestVal = perLine / c;
+                        break;
+                    }
+                }
+                coinsPerLine = bestCoins;
+                coinValue = bestVal;
+            }
+
+            function writeLocalOnly() {
+                try {
+                    state.settings.dbUrl = normalizeDbUrl(state.settings.dbUrl);
+                    const room = (state.settings.roomCode || DEFAULT_CLOUD_CONFIG.roomCode).trim();
+                    localStorage.setItem("EL_PROXIMO_GANADOR_ACTIVE_ROOM", room);
+                    localStorage.setItem(getRoomStorageKey(room), JSON.stringify(state));
+                } catch (_) {}
+            }
+
+            function persistState(pushRemote = true) {
+                state.settings.updatedAt = Date.now();
+                writeLocalOnly();
+                if (pushRemote) return pushToRemote();
+                return Promise.resolve(true);
+            }
+
+            // ==================== SINCRONIZACIÓN FIREBASE Y CRÉDITOS ====================
+            function getRemoteDatabaseEndpoint() {
+                const rawUrl = normalizeDbUrl(state.settings && state.settings.dbUrl);
+                if (!rawUrl) return null;
+                const room = encodeURIComponent((state.settings.roomCode || DEFAULT_CLOUD_CONFIG.roomCode).trim());
+                if (rawUrl.includes("firebaseio.com") || rawUrl.includes("firebasedatabase.app")) {
+                    return `${rawUrl}/el_proximo_ganador/${room}.json`;
+                }
+                return `${rawUrl}?room=${room}`;
+            }
+
+            function updateSyncPills() {
+                const pillSync = document.getElementById("pill-sync");
+                const pillRoom = document.getElementById("pill-room");
+                const detailEl = document.getElementById("adm-online-conn-detail");
+                const room = (state.settings.roomCode || DEFAULT_CLOUD_CONFIG.roomCode).trim();
+                const endpoint = getRemoteDatabaseEndpoint();
+
+                if (pillRoom) pillRoom.textContent = `🌐 Sala: ${room}`;
+
+                if (endpoint && remoteConnected) {
+                    if (pillSync) {
+                        pillSync.textContent = "En línea (Firebase)";
+                        pillSync.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/25 text-emerald-200 border border-emerald-400/40";
+                    }
+                    if (detailEl) detailEl.textContent = `Conectado a Firebase (${endpoint}).`;
+                } else if (endpoint) {
+                    if (pillSync) {
+                        pillSync.textContent = "En línea (Firebase)";
+                        pillSync.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-200 border border-cyan-300/35";
+                    }
+                    if (detailEl) detailEl.textContent = `Base configurada: ${DEFAULT_CLOUD_CONFIG.dbUrl} · Sala: ${room}.`;
+                }
+            }
+
+            function applyPendingApprovedCreditsToUser(userObj) {
+                if (!userObj || !userObj.id) return false;
+                userObj.appliedCreditIds = Array.isArray(userObj.appliedCreditIds) ? userObj.appliedCreditIds : [];
+                let changed = false;
+
+                const approvedRecharges = (state.rechargeRequests || []).filter(
+                    (r) => r.userId === userObj.id && r.status === "approved" && r.creditId
+                );
+
+                for (const req of approvedRecharges) {
+                    if (!userObj.appliedCreditIds.includes(req.creditId)) {
+                        const amt = Math.round(Number(req.amount) || 0);
+                        if (amt > 0) {
+                            userObj.balance = (Number(userObj.balance) || 0) + amt;
+                            userObj.appliedCreditIds.push(req.creditId);
+                            if (amt >= PROMO_RECHARGE_30K) {
+                                userObj.has30kRecharge = true;
+                                userObj.spinsAfter30k = 0;
+                                userObj.won50Spins30kBonus = false;
+                            }
+                            userObj.rechargeAlert = {
+                                amount: amt,
+                                creditId: req.creditId,
+                                ts: Number(req.approvedAt || Date.now())
+                            };
+                            userObj.updatedAt = Date.now();
+                            changed = true;
+                        }
+                    }
+                }
+                return changed;
+            }
+
+            function mergeRequestArrays(localArr, remoteArr) {
+                const map = new Map();
+                const addItem = (item) => {
+                    if (!item || !item.id) return;
+                    const prev = map.get(item.id);
+                    if (!prev) {
+                        map.set(item.id, { ...item });
+                        return;
+                    }
+                    const approved = prev.status === "approved" || item.status === "approved";
+                    const pTs = Number(prev.approvedAt || prev.createdAt || 0);
+                    const iTs = Number(item.approvedAt || item.createdAt || 0);
+                    const base = iTs >= pTs ? { ...prev, ...item } : { ...item, ...prev };
+                    if (approved) {
+                        base.status = "approved";
+                        base.approvedAt = Math.max(Number(prev.approvedAt || 0), Number(item.approvedAt || 0), Date.now());
+                        base.creditId = base.creditId || prev.creditId || item.creditId || `cred_${base.id}`;
+                    }
+                    map.set(item.id, base);
+                };
+                (Array.isArray(remoteArr) ? remoteArr : []).forEach(addItem);
+                (Array.isArray(localArr) ? localArr : []).forEach(addItem);
+                return Array.from(map.values()).sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
+            }
+
+            function mergeChatArrays(localArr, remoteArr) {
+                const map = new Map();
+                const addMsg = (m) => {
+                    if (!m || !m.id) return;
+                    if (!map.has(m.id)) map.set(m.id, { ...m });
+                };
+                (Array.isArray(remoteArr) ? remoteArr : []).forEach(addMsg);
+                (Array.isArray(localArr) ? localArr : []).forEach(addMsg);
+                return Array.from(map.values())
+                    .sort((a, b) => Number(a.ts || 0) - Number(b.ts || 0))
+                    .slice(-120);
+            }
+
+            function mergeEntryLogs(localArr, remoteArr) {
+                const map = new Map();
+                const addLog = (l) => {
+                    if (!l || !l.id) return;
+                    if (!map.has(l.id)) map.set(l.id, { ...l });
+                };
+                (Array.isArray(remoteArr) ? remoteArr : []).forEach(addLog);
+                (Array.isArray(localArr) ? localArr : []).forEach(addLog);
+                return Array.from(map.values())
+                    .sort((a, b) => Number(b.ts || 0) - Number(a.ts || 0))
+                    .slice(0, 80);
+            }
+
+            function mergeRemoteData(remoteData) {
+                try {
+                    if (!remoteData || typeof remoteData !== "object") return;
+                    const prevBalance = activeMode === "real" ? getCurrentBalance() : 0;
+
+                    if (remoteData.settings) {
+                        state.settings = {
+                            ...state.settings,
+                            ...remoteData.settings,
+                            dbUrl: DEFAULT_CLOUD_CONFIG.dbUrl,
+                            totalWagered: Math.max(Number(state.settings.totalWagered) || 0, Number(remoteData.settings.totalWagered) || 0),
+                            totalWon: Math.max(Number(state.settings.totalWon) || 0, Number(remoteData.settings.totalWon) || 0),
+                            totalPaidOutNet: Math.max(Number(state.settings.totalPaidOutNet) || 0, Number(remoteData.settings.totalPaidOutNet) || 0),
+                            totalHouseRetained: Math.max(Number(state.settings.totalHouseRetained) || 0, Number(remoteData.settings.totalHouseRetained) || 0)
+                        };
+                    }
+
+                    if (remoteData.traffic) {
+                        const lt = state.traffic || createDefaultState().traffic;
+                        const rt = remoteData.traffic;
+                        const mergedIds = new Set([
+                            ...(Array.isArray(lt.uniqueVisitorIds) ? lt.uniqueVisitorIds : []),
+                            ...(Array.isArray(rt.uniqueVisitorIds) ? rt.uniqueVisitorIds : [])
+                        ]);
+                        state.traffic = {
+                            totalLinkVisits: Math.max(Number(lt.totalLinkVisits) || 0, Number(rt.totalLinkVisits) || 0),
+                            uniqueVisitorIds: Array.from(mergedIds),
+                            demoEntries: Math.max(Number(lt.demoEntries) || 0, Number(rt.demoEntries) || 0),
+                            realEntries: Math.max(Number(lt.realEntries) || 0, Number(rt.realEntries) || 0),
+                            mobileCount: Math.max(Number(lt.mobileCount) || 0, Number(rt.mobileCount) || 0),
+                            desktopCount: Math.max(Number(lt.desktopCount) || 0, Number(rt.desktopCount) || 0),
+                            lastVisitAt: Math.max(Number(lt.lastVisitAt) || 0, Number(rt.lastVisitAt) || 0),
+                            entryLogs: mergeEntryLogs(lt.entryLogs, rt.entryLogs)
+                        };
+                    }
+
+                    state.chatMessages = mergeChatArrays(state.chatMessages, remoteData.chatMessages);
+                    state.rechargeRequests = mergeRequestArrays(state.rechargeRequests, remoteData.rechargeRequests);
+                    state.withdrawalRequests = mergeRequestArrays(state.withdrawalRequests, remoteData.withdrawalRequests);
+
+                    if (remoteData.users && typeof remoteData.users === "object") {
+                        Object.keys(remoteData.users).forEach((uid) => {
+                            const ru = remoteData.users[uid];
+                            const lu = state.users[uid];
+                            if (!lu) {
+                                state.users[uid] = { ...ru };
+                            } else {
+                                const rTime = Number(ru.updatedAt || ru.lastActiveAt || 0);
+                                const lTime = Number(lu.updatedAt || lu.lastActiveAt || 0);
+                                const mergedUser = rTime >= lTime ? { ...lu, ...ru } : { ...ru, ...lu };
+
+                                if (isSpinning && activeMode === "real" && uid === activeUserId && lu) {
+                                    mergedUser.balance = lu.balance;
+                                    mergedUser.totalWagered = lu.totalWagered;
+                                    mergedUser.totalWon = lu.totalWon;
+                                    mergedUser.spinsCount = lu.spinsCount;
+                                    mergedUser.isSpinning = true;
+                                }
+
+                                const mergedCredits = new Set([
+                                    ...(Array.isArray(lu.appliedCreditIds) ? lu.appliedCreditIds : []),
+                                    ...(Array.isArray(ru.appliedCreditIds) ? ru.appliedCreditIds : [])
+                                ]);
+                                mergedUser.appliedCreditIds = Array.from(mergedCredits);
+
+                                const rAlertTs = Number(ru.rechargeAlert && ru.rechargeAlert.ts ? ru.rechargeAlert.ts : 0);
+                                const lAlertTs = Number(lu.rechargeAlert && lu.rechargeAlert.ts ? lu.rechargeAlert.ts : 0);
+                                if (rAlertTs > lAlertTs) mergedUser.rechargeAlert = ru.rechargeAlert;
+                                else if (lAlertTs > rAlertTs) mergedUser.rechargeAlert = lu.rechargeAlert;
+
+                                state.users[uid] = mergedUser;
+                            }
+                            applyPendingApprovedCreditsToUser(state.users[uid]);
+                        });
+                    }
+
+                    Object.keys(state.users).forEach((uid) => {
+                        applyPendingApprovedCreditsToUser(state.users[uid]);
+                    });
+
+                    writeLocalOnly();
+                    updateSyncPills();
+
+                    if (activeMode) {
+                        renderPlayerChat();
+                    }
+
+                    if (!isSpinning && activeMode) {
+                        updateHUD();
+                        checkRechargeAlertBanner();
+                        const newBalance = activeMode === "real" ? getCurrentBalance() : 0;
+                        if (activeMode === "real" && newBalance > prevBalance) {
+                            notifyToast(`¡Recarga recibida! Nuevo saldo: ${formatMoney(newBalance)}`, "success");
+                        }
+                    }
+                    if (adminUnlocked) renderAdminPanel();
+                } catch (_) {}
+            }
+
+            async function pushToRemote() {
+                if (isSyncingNow) return remoteConnected;
+                isSyncingNow = true;
+                try {
+                    const url = getRemoteDatabaseEndpoint();
+                    if (!url) {
+                        remoteConnected = false;
+                        updateSyncPills();
+                        return false;
+                    }
+                    const res = await fetch(url, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(state)
+                    });
+                    remoteConnected = Boolean(res && res.ok);
+                    updateSyncPills();
+                    return remoteConnected;
+                } catch (_) {
+                    remoteConnected = false;
+                    updateSyncPills();
+                    return false;
+                } finally {
+                    isSyncingNow = false;
+                }
+            }
+
+            async function pullFromRemote() {
+                if (isSyncingNow) return;
+                isSyncingNow = true;
+                try {
+                    const url = getRemoteDatabaseEndpoint();
+                    if (!url) {
+                        remoteConnected = false;
+                        updateSyncPills();
+                        return;
+                    }
+                    const res = await fetch(url, { cache: "no-store" });
+                    if (res && res.ok) {
+                        remoteConnected = true;
+                        const data = await res.json();
+                        if (data) {
+                            mergeRemoteData(data);
+                        } else {
+                            isSyncingNow = false;
+                            await pushToRemote();
+                            return;
+                        }
+                    } else {
+                        remoteConnected = false;
+                    }
+                    updateSyncPills();
+                } catch (_) {
+                    remoteConnected = false;
+                    updateSyncPills();
+                } finally {
+                    isSyncingNow = false;
+                }
+            }
+
+            // ==================== MOTOR DE TRAGAMONEDAS Y COMBINACIONES SECRETAS ====================
+            function pickWeightedSymbol() {
+                const totalWeight = SYMBOLS.reduce((acc, s) => acc + s.weight, 0);
+                let r = Math.random() * totalWeight;
+                for (const sym of SYMBOLS) {
+                    r -= sym.weight;
+                    if (r <= 0) return sym;
+                }
+                return SYMBOLS[SYMBOLS.length - 1];
+            }
+
+            function createRandomGrid() {
+                const grid = [];
+                for (let c = 0; c < COLS; c++) {
+                    const col = [];
+                    for (let r = 0; r < ROWS; r++) col.push(pickWeightedSymbol());
+                    grid.push(col);
+                }
+                return grid;
+            }
+
+            function makeWinningGridOnLine(sym, matchLen, lineObj) {
+                const grid = createRandomGrid();
+                const winCoords = [];
+                for (let c = 0; c < matchLen; c++) {
+                    const r = lineObj.rows[c];
+                    grid[c][r] = sym;
+                    winCoords.push({ c, r });
+                }
+                return { grid, winCoords, lineObj, sym };
+            }
+
+            function checkSecretBetCombination(historyArr, userObj) {
+                if (!Array.isArray(historyArr) || historyArr.length === 0) return null;
+                const claimed = userObj && Array.isArray(userObj.claimedSecretCombos) ? userObj.claimedSecretCombos : [];
+
+                for (const combo of SECRET_BET_COMBINATIONS) {
+                    if (claimed.includes(combo.id)) continue;
+                    const len = combo.seq.length;
+                    if (historyArr.length < len) continue;
+                    const tail = historyArr.slice(-len);
+                    const matches = combo.seq.every((val, idx) => Number(tail[idx]) === Number(val));
+                    if (matches) {
+                        if (userObj) {
+                            userObj.claimedSecretCombos = [...claimed, combo.id];
+                        }
+                        return combo;
+                    }
+                }
+                return null;
+            }
+
+            function evaluateSpin(bet, userObj) {
+                const chosenLine = PAYLINE_PATHS[Math.floor(Math.random() * PAYLINE_PATHS.length)];
+                const symJewel = pickWeightedSymbol();
+                const symCrown = SYMBOLS.find((s) => s.id === "crown") || SYMBOLS[0];
+
+                let betHist = activeMode === "demo"
+                    ? demoBetHistory
+                    : (userObj ? (Array.isArray(userObj.recentBets) ? userObj.recentBets : []) : []);
+                betHist.push(Number(bet) || 0);
+                if (betHist.length > 25) betHist = betHist.slice(-25);
+                if (userObj) userObj.recentBets = betHist;
+
+                const matchedCombo = checkSecretBetCombination(betHist, userObj);
+                if (matchedCombo) {
+                    const built = makeWinningGridOnLine(symCrown, 5, PAYLINE_PATHS[0]);
+                    return {
+                        grid: built.grid,
+                        winCoords: built.winCoords,
+                        winLine: built.lineObj,
+                        winSymbol: symCrown,
+                        matchLen: 5,
+                        payout: matchedCombo.payout,
+                        note: "🎯 ¡COMBINACIÓN SECRETA!"
+                    };
+                }
+
+                if (userObj) {
+                    userObj.streakCount = Number(userObj.streakCount) || 0;
+                    userObj.spin1500Count = Number(userObj.spin1500Count) || 0;
+                    userObj.won1500FirstTime = Boolean(userObj.won1500FirstTime);
+                    userObj.spinsSince1500Win = Number(userObj.spinsSince1500Win) || 0;
+                    userObj.has30kRecharge = Boolean(userObj.has30kRecharge);
+                    userObj.earlyHits30k = Number(userObj.earlyHits30k) || 0;
+                    userObj.spinsAfter30k = Number(userObj.spinsAfter30k) || 0;
+                    userObj.won50Spins30kBonus = Boolean(userObj.won50Spins30kBonus);
+                }
+
+                if (userObj && userObj.has30kRecharge && !userObj.won50Spins30kBonus && userObj.spinsAfter30k >= 50) {
+                    userObj.won50Spins30kBonus = true;
+                    userObj.streakCount = 0;
+                    const built = makeWinningGridOnLine(symCrown, 5, PAYLINE_PATHS[0]);
+                    return {
+                        grid: built.grid,
+                        winCoords: built.winCoords,
+                        winLine: built.lineObj,
+                        winSymbol: symCrown,
+                        matchLen: 5,
+                        payout: 10000,
+                        note: "🔥 ¡Premio especial activado!"
+                    };
+                }
+
+                if (bet === 1500 && userObj) {
+                    userObj.spin1500Count += 1;
+                    if (!userObj.won1500FirstTime) {
+                        userObj.won1500FirstTime = true;
+                        userObj.spinsSince1500Win = 0;
+                        const built = makeWinningGridOnLine(symCrown, 4, PAYLINE_PATHS[0]);
+                        return {
+                            grid: built.grid,
+                            winCoords: built.winCoords,
+                            winLine: built.lineObj,
+                            winSymbol: symCrown,
+                            matchLen: 4,
+                            payout: 5000,
+                            note: "💎 ¡Giro especial de $1.500 premiado!"
+                        };
+                    }
+                    userObj.spinsSince1500Win += 1;
+                    if (userObj.spinsSince1500Win >= 10 && Math.random() < 0.65) {
+                        userObj.spinsSince1500Win = 0;
+                        const built = makeWinningGridOnLine(symCrown, 4, PAYLINE_PATHS[0]);
+                        return {
+                            grid: built.grid,
+                            winCoords: built.winCoords,
+                            winLine: built.lineObj,
+                            winSymbol: symCrown,
+                            matchLen: 4,
+                            payout: 5000,
+                            note: "⚡ ¡Premio especial de $1.500!"
+                        };
+                    }
+                }
+
+                const isStreakBet = [100, 200, 500].includes(bet);
+                if (userObj && isStreakBet && userObj.streakCount > 0 && userObj.streakCount < 3) {
+                    const streakChance = bet === 500 ? 0.62 : (bet === 200 ? 0.58 : 0.54);
+                    if (Math.random() < streakChance) {
+                        userObj.streakCount += 1;
+                        const payout = Math.max(50, Math.round(bet * (1.10 + Math.random() * 0.70)));
+                        const built = makeWinningGridOnLine(symJewel, 3, chosenLine);
+                        return {
+                            grid: built.grid,
+                            winCoords: built.winCoords,
+                            winLine: built.lineObj,
+                            winSymbol: symJewel,
+                            matchLen: 3,
+                            payout,
+                            note: `🔥 RACHA ${userObj.streakCount}/3`
+                        };
+                    } else {
+                        userObj.streakCount = 0;
+                    }
+                }
+
+                let winChance = 0.36;
+                if (isStreakBet) winChance = 0.42;
+                if (userObj && userObj.has30kRecharge && userObj.earlyHits30k < 5) winChance = 0.52;
+
+                if (Math.random() < winChance) {
+                    const rollLen = Math.random();
+                    const matchLen = rollLen < 0.04 ? 5 : (rollLen < 0.18 ? 4 : 3);
+                    if (userObj) {
+                        userObj.streakCount = isStreakBet ? Math.min(3, (userObj.streakCount || 0) + 1) : 0;
+                        if (userObj.has30kRecharge && userObj.earlyHits30k < 5) userObj.earlyHits30k += 1;
+                    }
+
+                    const lenBonus = matchLen === 5 ? 2.1 : (matchLen === 4 ? 1.45 : 1.0);
+                    let payout = Math.max(50, Math.round(bet * symJewel.mult * lenBonus * (0.95 + Math.random() * 0.65)));
+                    let note = null;
+
+                    if (userObj && userObj.has30kRecharge && userObj.earlyHits30k <= 5) {
+                        payout = Math.max(payout, Math.round(bet * 1.15));
+                    }
+
+                    const built = makeWinningGridOnLine(symJewel, matchLen, chosenLine);
+                    return {
+                        grid: built.grid,
+                        winCoords: built.winCoords,
+                        winLine: built.lineObj,
+                        winSymbol: symJewel,
+                        matchLen,
+                        payout,
+                        note
+                    };
+                }
+
+                if (userObj) userObj.streakCount = 0;
+                return { grid: createRandomGrid(), winCoords: [], winLine: null, winSymbol: null, matchLen: 0, payout: 0, note: null };
+            }
+
+            let currentGrid = createRandomGrid();
+            let activeWinCoords = [];
+            let activeWinLine = null;
+
+            function spawnWinParticles(w, h, highlightCoords = []) {
+                winParticles = [];
+                const originX = highlightCoords.length > 0 ? ((highlightCoords[0].c + 0.5) / COLS) * w : w * 0.5;
+                const originY = highlightCoords.length > 0 ? ((highlightCoords[0].r + 0.5) / ROWS) * h : h * 0.5;
+                const colors = ["#ffd426", "#ff2a85", "#00e5ff", "#34d399", "#ffffff"];
+                for (let i = 0; i < 28; i++) {
+                    const angle = (Math.PI * 2 * i) / 28 + (Math.random() - 0.5) * 0.35;
+                    const speed = 1.6 + Math.random() * 3.8;
+                    winParticles.push({
+                        x: originX,
+                        y: originY,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed - 1.2,
+                        r: 2.2 + Math.random() * 3.2,
+                        alpha: 1,
+                        color: colors[i % colors.length]
+                    });
+                }
+                if (particleRafId) cancelAnimationFrame(particleRafId);
+                const stepParticles = () => {
+                    let alive = false;
+                    for (const p of winParticles) {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vy += 0.11;
+                        p.alpha -= 0.026;
+                        if (p.alpha > 0.02) alive = true;
+                    }
+                    if (!isSpinning) {
+                        drawSlotCanvas(currentGrid, activeWinCoords, activeWinLine, [false, false, false, false, false]);
+                    }
+                    if (alive) {
+                        particleRafId = requestAnimationFrame(stepParticles);
+                    } else {
+                        winParticles = [];
+                        particleRafId = null;
+                    }
+                };
+                particleRafId = requestAnimationFrame(stepParticles);
+            }
+
+            function drawSlotCanvas(grid, highlightCoords = [], winLineObj = null, movingCols = []) {
+                const canvas = document.getElementById("slot-canvas");
+                if (!canvas || !canvas.parentElement) return;
+                const rect = canvas.parentElement.getBoundingClientRect();
+                const dpr = Math.min(2.5, window.devicePixelRatio || 1);
+                const w = Math.max(240, Math.floor(rect.width));
+                const h = Math.max(160, Math.floor(rect.height));
+
+                if (canvas.width !== Math.floor(w * dpr) || canvas.height !== Math.floor(h * dpr)) {
+                    canvas.width = Math.floor(w * dpr);
+                    canvas.height = Math.floor(h * dpr);
+                }
+
+                const ctx = canvas.getContext("2d");
+                ctx.save();
+                ctx.scale(dpr, dpr);
+
+                const cylGrad = ctx.createLinearGradient(0, 0, 0, h);
+                cylGrad.addColorStop(0, "#190233");
+                cylGrad.addColorStop(0.18, "#470e82");
+                cylGrad.addColorStop(0.50, "#290652");
+                cylGrad.addColorStop(0.82, "#470e82");
+                cylGrad.addColorStop(1, "#140129");
+                ctx.fillStyle = cylGrad;
+                ctx.fillRect(0, 0, w, h);
+
+                const cellW = w / COLS;
+                const cellH = h / ROWS;
+
+                for (let c = 0; c < COLS; c++) {
+                    const colGrad = ctx.createLinearGradient(c * cellW, 0, (c + 1) * cellW, 0);
+                    colGrad.addColorStop(0, "rgba(0, 0, 0, 0.36)");
+                    colGrad.addColorStop(0.22, "rgba(255, 255, 255, 0.08)");
+                    colGrad.addColorStop(0.78, "rgba(255, 255, 255, 0.03)");
+                    colGrad.addColorStop(1, "rgba(0, 0, 0, 0.42)");
+                    ctx.fillStyle = colGrad;
+                    ctx.fillRect(c * cellW, 0, cellW, h);
+
+                    if (c > 0) {
+                        ctx.strokeStyle = "rgba(255, 224, 102, 0.28)";
+                        ctx.lineWidth = 1.25;
+                        ctx.beginPath();
+                        ctx.moveTo(c * cellW, 0);
+                        ctx.lineTo(c * cellW, h);
+                        ctx.stroke();
+                    }
+                }
+
+                const highlightSet = new Set(highlightCoords.map((pt) => `${pt.c},${pt.r}`));
+
+                for (let c = 0; c < COLS; c++) {
+                    const isMoving = Boolean(movingCols[c]);
+
+                    if (isMoving) {
+                        const streakGrad = ctx.createLinearGradient(0, 0, 0, h);
+                        streakGrad.addColorStop(0, "rgba(255, 212, 38, 0.05)");
+                        streakGrad.addColorStop(0.5, "rgba(255, 255, 255, 0.28)");
+                        streakGrad.addColorStop(1, "rgba(255, 42, 133, 0.10)");
+                        ctx.fillStyle = streakGrad;
+                        ctx.fillRect(c * cellW + 3, 0, cellW - 6, h);
+                    }
+
+                    for (let r = 0; r < ROWS; r++) {
+                        const sym = (grid[c] && grid[c][r]) || SYMBOLS[0];
+                        const cx = c * cellW + cellW / 2;
+                        const cy = r * cellH + cellH / 2;
+                        const isWin = highlightSet.has(`${c},${r}`);
+
+                        const radialGlow = ctx.createRadialGradient(cx, cy, 4, cx, cy, Math.min(cellW, cellH) * 0.44);
+                        radialGlow.addColorStop(0, isWin ? "rgba(255, 224, 102, 0.45)" : (sym.glow || "rgba(255, 255, 255, 0.14)"));
+                        radialGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+                        ctx.fillStyle = radialGlow;
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, Math.min(cellW, cellH) * 0.44, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        if (isWin) {
+                            ctx.save();
+                            ctx.strokeStyle = "#ffe066";
+                            ctx.shadowColor = "#ffd426";
+                            ctx.shadowBlur = 12;
+                            ctx.lineWidth = 2.2;
+                            ctx.strokeRect(c * cellW + 5, r * cellH + 5, cellW - 10, cellH - 10);
+                            ctx.restore();
+                        }
+
+                        ctx.save();
+                        if (isMoving) {
+                            ctx.translate(cx, cy);
+                            ctx.scale(1, 1.28);
+                            ctx.globalAlpha = 0.85;
+                            ctx.translate(-cx, -cy);
+                        } else {
+                            ctx.shadowColor = "rgba(0, 0, 0, 0.75)";
+                            ctx.shadowBlur = 6;
+                            ctx.shadowOffsetY = 3;
+                        }
+                        const fontSize = Math.max(24, Math.min(cellW * 0.52, cellH * 0.64));
+                        ctx.font = `${fontSize}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
+                        ctx.textAlign = "center";
+                        ctx.textBaseline = "middle";
+                        ctx.fillText(sym.glyph, cx, cy);
+                        ctx.restore();
+                    }
+                }
+
+                if (winLineObj && highlightCoords.length >= 2) {
+                    ctx.save();
+                    ctx.strokeStyle = winLineObj.color || "#ffd426";
+                    ctx.shadowColor = winLineObj.color || "#ffd426";
+                    ctx.shadowBlur = 16;
+                    ctx.lineWidth = 4.2;
+                    ctx.lineCap = "round";
+                    ctx.lineJoin = "round";
+                    ctx.beginPath();
+                    highlightCoords.forEach((pt, idx) => {
+                        const px = pt.c * cellW + cellW / 2;
+                        const py = pt.r * cellH + cellH / 2;
+                        if (idx === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    });
+                    ctx.stroke();
+
+                    ctx.strokeStyle = "rgba(255, 255, 255, 0.85)";
+                    ctx.shadowBlur = 0;
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+
+                if (winParticles.length > 0) {
+                    for (const p of winParticles) {
+                        if (p.alpha <= 0) continue;
+                        ctx.save();
+                        ctx.globalAlpha = Math.max(0, p.alpha);
+                        ctx.fillStyle = p.color;
+                        ctx.shadowColor = p.color;
+                        ctx.shadowBlur = 8;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                    }
+                }
+
+                const glassSheen = ctx.createLinearGradient(0, 0, 0, h * 0.28);
+                glassSheen.addColorStop(0, "rgba(255, 255, 255, 0.14)");
+                glassSheen.addColorStop(1, "rgba(255, 255, 255, 0)");
+                ctx.fillStyle = glassSheen;
+                ctx.fillRect(0, 0, w, h * 0.28);
+
+                ctx.restore();
+            }
+
+            function spinReelsAnimation(finalGrid, winCoords, winLineObj, onComplete) {
+                isSpinning = true;
+                winParticles = [];
+                updateSpinButtonState();
+
+                const isFast = turboMode;
+                const duration = isFast ? 380 : 920;
+                const startTime = performance.now();
+                const stopTimes = isFast ? [0.25, 0.42, 0.58, 0.75, 0.92] : [0.35, 0.50, 0.65, 0.80, 0.95];
+
+                function frame(now) {
+                    const progress = Math.min(1, (now - startTime) / duration);
+                    const animatedGrid = [];
+                    const movingCols = [];
+                    for (let c = 0; c < COLS; c++) {
+                        if (progress >= stopTimes[c]) {
+                            animatedGrid.push(finalGrid[c]);
+                            movingCols.push(false);
+                        } else {
+                            movingCols.push(true);
+                            const col = [];
+                            for (let r = 0; r < ROWS; r++) col.push(pickWeightedSymbol());
+                            animatedGrid.push(col);
+                        }
+                    }
+
+                    drawSlotCanvas(animatedGrid, [], null, movingCols);
+                    if (progress < 1) {
+                        requestAnimationFrame(frame);
+                    } else {
+                        currentGrid = finalGrid;
+                        activeWinCoords = winCoords;
+                        activeWinLine = winLineObj;
+                        drawSlotCanvas(currentGrid, activeWinCoords, activeWinLine, [false, false, false, false, false]);
+                        isSpinning = false;
+                        updateSpinButtonState();
+                        if (typeof onComplete === "function") onComplete();
+                    }
+                }
+
+                requestAnimationFrame(frame);
+            }
+
+            // ==================== HUD Y TABLA DE PAGOS ====================
+            function highlightPaytableSymbol(symId = null) {
+                document.querySelectorAll(".epg-pay-cell").forEach((cell) => {
+                    cell.classList.remove("is-highlighted");
+                });
+                if (symId) {
+                    const target = document.getElementById(`paycell-${symId}`);
+                    if (target) target.classList.add("is-highlighted");
+                }
+            }
+
+            function refreshPaytableAmounts() {
+                const unitBase = Math.max(10, currentBet / PAYLINES_COUNT);
+                SYMBOLS.forEach((s) => {
+                    const e5 = document.getElementById(`p-${s.id}-5`);
+                    const e4 = document.getElementById(`p-${s.id}-4`);
+                    const e3 = document.getElementById(`p-${s.id}-3`);
+                    if (e5) e5.textContent = formatMoney(unitBase * s.m5);
+                    if (e4) e4.textContent = formatMoney(unitBase * s.m4);
+                    if (e3) e3.textContent = formatMoney(unitBase * s.m3);
+                });
+            }
+
+            function getActiveUser() {
+                if (activeMode === "real" && activeUserId && state.users[activeUserId]) {
+                    return state.users[activeUserId];
+                }
+                return null;
+            }
+
+            function getCurrentBalance() {
+                if (activeMode === "demo") return demoBalance;
+                const u = getActiveUser();
+                return u ? Math.max(0, Number(u.balance) || 0) : 0;
+            }
+
+            function updateSpinButtonState() {
+                const spinBtn = document.getElementById("btn-spin");
+                if (spinBtn) {
+                    spinBtn.disabled = isSpinning || !activeMode || getCurrentBalance() < currentBet;
+                    spinBtn.classList.toggle("is-active", turboMode);
+                }
+
+                const autoBtn = document.getElementById("btn-auto-spin");
+                if (autoBtn) {
+                    autoBtn.classList.toggle("is-active", autoSpinActive);
+                    document.getElementById("auto-spin-icon").textContent = autoSpinActive ? "⏹️" : "🔁";
+                    document.getElementById("auto-spin-badge").textContent = autoSpinActive ? "STOP" : "AUTO";
+                }
+
+                const turboModalBtn = document.getElementById("btn-toggle-turbo-modal");
+                if (turboModalBtn) {
+                    turboModalBtn.textContent = turboMode ? "Activado ⚡" : "Desactivado";
+                }
+            }
+
+            function updateHUD() {
+                const bal = getCurrentBalance();
+                document.getElementById("hud-balance").textContent = formatMoney(bal);
+                document.getElementById("hud-current-bet").textContent = formatMoney(currentBet);
+
+                document.getElementById("cfg-coins-val").textContent = String(coinsPerLine);
+                document.getElementById("cfg-coinval-val").textContent = formatMoney(coinValue);
+                document.getElementById("cfg-total-val").textContent = formatMoney(currentBet);
+
+                refreshPaytableAmounts();
+
+                if (activeMode === "demo") {
+                    document.getElementById("pill-player").textContent = "Jugador Demo";
+                    document.getElementById("stat-total-prizes").textContent = formatMoney(demoTotalPrizes);
+                    document.getElementById("stat-withdrawn-done").textContent = "$0";
+                } else if (activeMode === "real") {
+                    const u = getActiveUser();
+                    if (u) {
+                        document.getElementById("pill-player").textContent = `${u.nick} · ${u.whatsapp}`;
+                        document.getElementById("stat-total-prizes").textContent = formatMoney(Number(u.totalWon) || 0);
+                        document.getElementById("stat-withdrawn-done").textContent = formatMoney(Number(u.totalWithdrawnNet) || 0);
+                    }
+                }
+
+                updateSpinButtonState();
+            }
+
+            function stopAutoSpin() {
+                autoSpinActive = false;
+                if (autoSpinTimer) {
+                    clearTimeout(autoSpinTimer);
+                    autoSpinTimer = null;
+                }
+                updateSpinButtonState();
+            }
+
+            function clearHoldTimer() {
+                if (holdTurboTimer) {
+                    clearTimeout(holdTurboTimer);
+                    holdTurboTimer = null;
+                }
+            }
+
+            function scheduleNextAutoSpin() {
+                if (!autoSpinActive) return;
+                if (getCurrentBalance() < currentBet) {
+                    stopAutoSpin();
+                    notifyToast("Auto-giro detenido: saldo insuficiente.", "info");
+                    return;
+                }
+                autoSpinTimer = setTimeout(() => {
+                    if (autoSpinActive && !isSpinning) handleSpin();
+                }, turboMode ? 240 : 520);
+            }
+
+            function renderPlayerChat() {
+                const box = document.getElementById("player-chat-messages");
+                if (!box) return;
+                const msgs = Array.isArray(state.chatMessages) ? state.chatMessages : [];
+                const u = getActiveUser();
+                const visibleMsgs = msgs.filter((m) => {
+                    if (!m.targetUserId || m.targetUserId === "all") return true;
+                    if (!u) return false;
+                    return m.targetUserId === u.id || m.senderId === u.id;
+                });
+
+                if (!visibleMsgs.length) {
+                    box.innerHTML = '<p class="text-white/55 text-[11px]">Aún no hay mensajes. Escríbele al Admin aquí.</p>';
+                    return;
+                }
+
+                box.innerHTML = visibleMsgs.map((m) => {
+                    const isAdmin = m.senderRole === "admin";
+                    return `
+                        <div class="rounded-lg px-2.5 py-1.5 ${isAdmin ? "bg-amber-400/20 border border-amber-300/35 text-amber-100" : "bg-cyan-500/20 border border-cyan-300/30 text-cyan-50"}">
+                            <div class="flex items-center justify-between text-[10px] font-bold opacity-85">
+                                <span>${isAdmin ? "🛡️ Admin" : "👤 " + (m.senderName || "Jugador")}</span>
+                                <span>${formatTimeStamp(m.ts)}</span>
+                            </div>
+                            <div class="mt-0.5 text-xs break-words">${m.text}</div>
+                        </div>
+                    `;
+                }).join("");
+                box.scrollTop = box.scrollHeight;
+            }
+
+            async function enterWorkspace(mode, userId = null) {
+                trackAudio.playTrack();
+                activeMode = mode;
+                activeUserId = userId;
+                stopAutoSpin();
+                clearHoldTimer();
+                const uObj = mode === "real" && userId ? state.users[userId] : null;
+                recordGameEntry(mode, uObj);
+
+                if (mode === "demo") {
+                    demoBalance = DEMO_START_BALANCE;
+                    demoTotalPrizes = 0;
+                    demoBetHistory = [];
+                    await persistState(true);
+                } else if (mode === "real" && uObj) {
+                    uObj.online = true;
+                    uObj.isSpinning = false;
+                    uObj.lastActiveAt = Date.now();
+                    uObj.updatedAt = Date.now();
+                    applyPendingApprovedCreditsToUser(uObj);
+                    await persistState(true);
+                }
+
+                document.getElementById("entry-screen").classList.add("hidden");
+                document.getElementById("game-workspace").classList.remove("hidden");
+                document.getElementById("sensational-banner").classList.add("hidden");
+                document.getElementById("slot-status-main").textContent = "¡BUENA SUERTE!";
+                document.getElementById("slot-status-sub").textContent = "Toca girar o mantén pulsado para Tirada Turbo";
+                highlightPaytableSymbol(null);
+                drawSlotCanvas(currentGrid, [], null, [false, false, false, false, false]);
+                updateHUD();
+                renderPlayerChat();
+                checkRechargeAlertBanner();
+            }
+
+            function returnToEntryScreen() {
+                stopAutoSpin();
+                clearHoldTimer();
+                if (activeMode === "real" && activeUserId && state.users[activeUserId]) {
+                    state.users[activeUserId].online = false;
+                    state.users[activeUserId].isSpinning = false;
+                    state.users[activeUserId].lastActiveAt = Date.now();
+                    state.users[activeUserId].updatedAt = Date.now();
+                    persistState(true);
+                }
+                activeMode = null;
+                activeUserId = null;
+                document.getElementById("game-workspace").classList.add("hidden");
+                document.getElementById("entry-screen").classList.remove("hidden");
+                document.getElementById("recharge-success-banner").classList.add("hidden");
+                document.getElementById("pill-player").textContent = "Sin jugador activo";
+            }
+
+            function handleSpin() {
+                if (isSpinning || !activeMode) return;
+                trackAudio.playTrack();
+
+                if (getCurrentBalance() < currentBet) {
+                    stopAutoSpin();
+                    notifyToast("Saldo insuficiente. Recarga o ajusta la apuesta.", "error");
+                    return;
+                }
+
+                if (activeMode === "demo") {
+                    demoBalance -= currentBet;
+                } else if (activeMode === "real") {
+                    const u = getActiveUser();
+                    if (!u) return;
+                    u.balance = Math.max(0, Number(u.balance) - currentBet);
+                    u.totalWagered = (Number(u.totalWagered) || 0) + currentBet;
+                    u.spinsCount = (Number(u.spinsCount) || 0) + 1;
+                    if (u.has30kRecharge && !u.won50Spins30kBonus) {
+                        u.spinsAfter30k = (Number(u.spinsAfter30k) || 0) + 1;
+                    }
+                    u.isSpinning = true;
+                    u.online = true;
+                    u.lastActiveAt = Date.now();
+                    u.updatedAt = Date.now();
+                    state.settings.totalWagered = (Number(state.settings.totalWagered) || 0) + currentBet;
+                }
+
+                highlightPaytableSymbol(null);
+                document.getElementById("sensational-banner").classList.add("hidden");
+                document.getElementById("slot-status-main").textContent = turboMode ? "⚡ TIRADA TURBO..." : "GIRANDO...";
+                document.getElementById("slot-status-sub").textContent = "";
+                updateHUD();
+
+                const uObj = getActiveUser();
+                const outcome = evaluateSpin(currentBet, uObj);
+
+                spinReelsAnimation(outcome.grid, outcome.winCoords, outcome.winLine, () => {
+                    const winAmt = outcome.payout;
+                    const canvasEl = document.getElementById("slot-canvas");
+                    const rect = canvasEl ? canvasEl.getBoundingClientRect() : { width: 400, height: 210 };
+
+                    if (winAmt > 0) {
+                        if (activeMode === "demo") {
+                            demoBalance += winAmt;
+                            demoTotalPrizes += winAmt;
+                        } else if (activeMode === "real" && uObj) {
+                            uObj.balance = (Number(uObj.balance) || 0) + winAmt;
+                            uObj.totalWon = (Number(uObj.totalWon) || 0) + winAmt;
+                            uObj.isSpinning = false;
+                            uObj.lastActiveAt = Date.now();
+                            uObj.updatedAt = Date.now();
+                            state.settings.totalWon = (Number(state.settings.totalWon) || 0) + winAmt;
+                        }
+                        const isBig = winAmt >= currentBet * 1.6 || winAmt >= 5000;
+                        spawnWinParticles(Math.max(240, rect.width), Math.max(160, rect.height), outcome.winCoords);
+
+                        if (outcome.winSymbol) highlightPaytableSymbol(outcome.winSymbol.id);
+
+                        if (isBig) {
+                            document.getElementById("sensational-title").textContent = winAmt >= 5000 ? "SENSATIONAL!" : "SUPER WIN!";
+                            document.getElementById("sensational-amount").textContent = formatMoney(winAmt);
+                            document.getElementById("sensational-banner").classList.remove("hidden");
+                        }
+
+                        document.getElementById("slot-status-main").textContent = `GANANCIA ${formatMoney(winAmt)}`;
+                        const lineNum = outcome.winLine ? outcome.winLine.id : 1;
+                        const glyphIcon = outcome.winSymbol ? outcome.winSymbol.glyph.repeat(Math.min(5, outcome.matchLen || 3)) : "💎💎💎";
+                        document.getElementById("slot-status-sub").textContent =
+                            outcome.note ? `${outcome.note} · LA LÍNEA ${lineNum} ABONA ${formatMoney(winAmt)}` : `${glyphIcon} LA LÍNEA ${lineNum} ABONA ${formatMoney(winAmt)}`;
+                        updateHUD();
+                    } else {
+                        if (activeMode === "real" && uObj) {
+                            uObj.isSpinning = false;
+                            uObj.lastActiveAt = Date.now();
+                            uObj.updatedAt = Date.now();
+                        }
+                        highlightPaytableSymbol(null);
+                        document.getElementById("slot-status-main").textContent = "¡BUENA SUERTE!";
+                        document.getElementById("slot-status-sub").textContent = "Toca girar o mantén pulsado para Tirada Turbo";
+                        updateHUD();
+                    }
+
+                    if (activeMode === "real") persistState(true);
+                    if (autoSpinActive) scheduleNextAutoSpin();
+                });
+            }
+
+            // ==================== RECARGAS Y RETIROS ====================
+            function buildRechargeWhatsAppUrl(userObj, amount) {
+                const adminWa = cleanPhoneDigits(state.settings.whatsappAdmin || DEFAULT_CLOUD_CONFIG.whatsappAdmin);
+                const nick = userObj ? userObj.nick : "Jugador Invitado";
+                const phone = userObj ? userObj.whatsapp : "No registrado";
+                const lines = [
+                    "🎰 *SOLICITUD DE RECARGA — EL PRÓXIMO GANADOR · TU APP QUE SÍ TE PAGA*",
+                    `👤 Nick: ${nick}`,
+                    `📱 WhatsApp: ${phone}`,
+                    `💰 Valor solicitado: ${formatMoney(amount)}`,
+                    "📎 Adjunto el comprobante para acreditar mi saldo."
+                ];
+                return `https://wa.me/${adminWa}?text=${encodeURIComponent(lines.join("\n"))}`;
+            }
+
+            function refreshRechargeModalLinks() {
+                const waBtn = document.getElementById("btn-wa-receipt");
+                const amt = Number(document.getElementById("recharge-amount").value) || MIN_RECHARGE;
+                const u = getActiveUser();
+                if (waBtn) waBtn.href = buildRechargeWhatsAppUrl(u, amt);
+            }
+
+            function checkRechargeAlertBanner() {
+                const banner = document.getElementById("recharge-success-banner");
+                const u = getActiveUser();
+                if (!banner || activeMode !== "real" || !u || !u.rechargeAlert) {
+                    if (banner) banner.classList.add("hidden");
+                    return;
+                }
+                document.getElementById("recharge-banner-amount").textContent = `+${formatMoney(u.rechargeAlert.amount)}`;
+                document.getElementById("recharge-banner-detail").textContent =
+                    `¡Felicidades ${u.nick}! Tu recarga fue acreditada. Saldo actual: ${formatMoney(u.balance)}.`;
+                banner.classList.remove("hidden");
+            }
+
+            async function creditUserBalance(userId, amount, fromRequestId = null) {
+                const addAmt = Math.round(Number(amount) || 0);
+                if (!userId || addAmt <= 0) {
+                    notifyToast("Ingresa un monto mayor a $0 para acreditar.", "error");
+                    return;
+                }
+
+                await pullFromRemote();
+
+                const targetUser = state.users[userId];
+                if (!targetUser) {
+                    notifyToast("No se encontró el usuario en la sala.", "error");
+                    return;
+                }
+
+                const creditId = `cred_${fromRequestId || "manual"}_${Date.now()}`;
+                if (fromRequestId && Array.isArray(state.rechargeRequests)) {
+                    const req = state.rechargeRequests.find((r) => r.id === fromRequestId);
+                    if (req) {
+                        req.status = "approved";
+                        req.approvedAt = Date.now();
+                        req.creditId = req.creditId || creditId;
+                    }
+                } else {
+                    const manualReq = {
+                        id: `rec_man_${Date.now()}`,
+                        creditId,
+                        userId: targetUser.id,
+                        nick: targetUser.nick,
+                        userName: targetUser.nick,
+                        whatsapp: targetUser.whatsapp,
+                        pin: targetUser.pin,
+                        nequiNumber: state.settings.nequiNumber || DEFAULT_CLOUD_CONFIG.nequiNumber,
+                        amount: addAmt,
+                        status: "approved",
+                        createdAt: Date.now(),
+                        approvedAt: Date.now()
+                    };
+                    state.rechargeRequests = mergeRequestArrays([manualReq], state.rechargeRequests);
+                }
+
+                applyPendingApprovedCreditsToUser(targetUser);
+                targetUser.updatedAt = Date.now() + 5000;
+                state.settings.updatedAt = Date.now() + 5000;
+
+                writeLocalOnly();
+                const savedOk = await pushToRemote();
+
+                renderAdminPanel();
+                if (!isSpinning && activeMode === "real" && activeUserId === userId) {
+                    updateHUD();
+                    checkRechargeAlertBanner();
+                }
+
+                if (savedOk) {
+                    notifyToast(`Recarga de ${formatMoney(addAmt)} aprobada para ${targetUser.nick}.`, "success");
+                } else {
+                    notifyToast(`Guardado local de ${formatMoney(addAmt)} para ${targetUser.nick}.`, "info");
+                }
+            }
+
+            function updateWithdrawBreakdown() {
+                const rawAmt = Number(document.getElementById("withdraw-amount").value) || 0;
+                const houseCut = Math.round(rawAmt * HOUSE_RETENTION_SHARE);
+                const playerNet = Math.max(0, rawAmt - houseCut);
+                document.getElementById("wd-calc-gross").textContent = formatMoney(rawAmt);
+                document.getElementById("wd-calc-house").textContent = `-${formatMoney(houseCut)}`;
+                document.getElementById("wd-calc-net").textContent = formatMoney(playerNet);
+            }
+
+            // ==================== PANEL ADMIN ====================
+            function getPresenceInfo(u) {
+                const now = Date.now();
+                const last = Number((u && (u.lastActiveAt || u.updatedAt)) || 0);
+                const diffSec = Math.max(0, Math.floor((now - last) / 1000));
+                if (u && u.online && diffSec <= 120) {
+                    return { online: true, label: u.isSpinning ? "Jugando" : "En línea" };
+                }
+                return { online: false, label: `Hace ${Math.max(1, Math.floor(diffSec / 60))}m` };
+            }
+
+            async function clearEntryLogs() {
+                if (!state.traffic) state.traffic = createDefaultState().traffic;
+                state.traffic.entryLogs = [];
+                state.traffic.totalLinkVisits = 0;
+                state.traffic.uniqueVisitorIds = [];
+                state.traffic.demoEntries = 0;
+                state.traffic.realEntries = 0;
+                state.traffic.mobileCount = 0;
+                state.traffic.desktopCount = 0;
+                state.traffic.lastVisitAt = 0;
+                await persistState(true);
+                renderAdminPanel();
+                notifyToast("Historial de ingresos limpiado.", "success");
+            }
+
+            async function clearChatMessages() {
+                state.chatMessages = [];
+                await persistState(true);
+                renderAdminPanel();
+                renderPlayerChat();
+                notifyToast("Chat limpiado.", "success");
+            }
+
+            async function clearRechargeRequests() {
+                state.rechargeRequests = [];
+                await persistState(true);
+                renderAdminPanel();
+                notifyToast("Solicitudes de recarga limpiadas.", "success");
+            }
+
+            async function clearWithdrawalRequests() {
+                state.withdrawalRequests = [];
+                await persistState(true);
+                renderAdminPanel();
+                notifyToast("Solicitudes de retiro limpiadas.", "success");
+            }
+
+            async function clearRequestsHistory() {
+                state.rechargeRequests = (state.rechargeRequests || []).filter((r) => r.status === "pending");
+                state.withdrawalRequests = (state.withdrawalRequests || []).filter((w) => w.status === "pending");
+                state.settings.updatedAt = Date.now();
+                writeLocalOnly();
+                await pushToRemote();
+                renderAdminPanel();
+                notifyToast("Historial de solicitudes limpiado.", "success");
+            }
+
+            function renderAdminChat(usersArr) {
+                const selectEl = document.getElementById("adm-chat-target");
+                const box = document.getElementById("adm-chat-messages");
+                if (!selectEl || !box) return;
+
+                const currentVal = selectEl.value || "all";
+                selectEl.innerHTML = '<option value="all">Sala General / Todos</option>' +
+                    usersArr.map((u) => `<option value="${u.id}">👤 ${u.nick} (${u.whatsapp})</option>`).join("");
+                if ([...selectEl.options].some((o) => o.value === currentVal)) {
+                    selectEl.value = currentVal;
+                }
+
+                const msgs = Array.isArray(state.chatMessages) ? state.chatMessages : [];
+                if (!msgs.length) {
+                    box.innerHTML = '<p class="text-white/55 text-[11px]">Sin mensajes en el chat todavía.</p>';
+                    return;
+                }
+
+                box.innerHTML = msgs.map((m) => {
+                    const isAdmin = m.senderRole === "admin";
+                    const targetLabel = m.targetUserId && m.targetUserId !== "all" && state.users[m.targetUserId]
+                        ? ` → ${state.users[m.targetUserId].nick}`
+                        : " → Todos";
+                    return `
+                        <div class="rounded-lg px-3 py-1.5 ${isAdmin ? "bg-amber-400/15 border border-amber-300/30 text-amber-100" : "bg-cyan-500/15 border border-cyan-300/30 text-cyan-100"}">
+                            <div class="flex items-center justify-between text-[10px] font-bold opacity-85">
+                                <span>${isAdmin ? "🛡️ Admin" + targetLabel : "👤 " + (m.senderName || "Jugador")}</span>
+                                <span>${formatTimeStamp(m.ts)}</span>
+                            </div>
+                            <div class="mt-0.5 text-xs break-words">${m.text}</div>
+                        </div>
+                    `;
+                }).join("");
+                box.scrollTop = box.scrollHeight;
+            }
+
+            function renderSecretCombosAdmin() {
+                const box = document.getElementById("adm-secret-combos-list");
+                if (!box) return;
+                box.innerHTML = SECRET_BET_COMBINATIONS.map((c) => {
+                    const stepsText = c.seq.map((v) => formatMoney(v)).join(" → ");
+                    return `
+                        <div class="rounded-xl bg-black/50 border border-amber-300/25 px-3 py-2 flex items-center justify-between gap-2">
+                            <div class="space-y-0.5">
+                                <div class="font-black text-white text-xs">${c.name} <span class="text-[10px] text-amber-200/80">(${c.difficulty})</span></div>
+                                <div class="text-[11px] text-cyan-200 font-bold">${stepsText}</div>
+                            </div>
+                            <span class="font-display text-sm font-bold text-emerald-300 shrink-0">+${formatMoney(c.payout)}</span>
+                        </div>
+                    `;
+                }).join("");
+            }
+
+            function renderAdminPanel() {
+                if (!adminUnlocked) {
+                    document.getElementById("admin-lock-view").classList.remove("hidden");
+                    document.getElementById("admin-dashboard-view").classList.add("hidden");
+                    return;
+                }
+                document.getElementById("admin-lock-view").classList.add("hidden");
+                document.getElementById("admin-dashboard-view").classList.remove("hidden");
+
+                renderSecretCombosAdmin();
+
+                const now = Date.now();
+                const oneDayMs = 24 * 60 * 60 * 1000;
+                const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+
+                const tr = state.traffic || createDefaultState().traffic;
+                const linkVisits = Number(tr.totalLinkVisits) || 0;
+                const uniqueDevices = Array.isArray(tr.uniqueVisitorIds) ? tr.uniqueVisitorIds.length : 0;
+                const demoEnt = Number(tr.demoEntries) || 0;
+                const realEnt = Number(tr.realEntries) || 0;
+                const mobileCnt = Number(tr.mobileCount) || 0;
+                const desktopCnt = Number(tr.desktopCount) || 0;
+                const totalEntriesGame = demoEnt + realEnt;
+
+                document.getElementById("adm-t-link-visits").textContent = String(linkVisits);
+                document.getElementById("adm-t-unique-visitors").textContent = String(uniqueDevices);
+                document.getElementById("adm-t-demo-entries").textContent = String(demoEnt);
+                document.getElementById("adm-t-real-entries").textContent = String(realEnt);
+                document.getElementById("adm-dev-mobile").textContent = String(mobileCnt);
+                document.getElementById("adm-dev-desktop").textContent = String(desktopCnt);
+                document.getElementById("adm-dev-entries-total").textContent = String(totalEntriesGame);
+                document.getElementById("adm-last-visit-time").textContent = tr.lastVisitAt
+                    ? `Última visita: ${formatTimeStamp(tr.lastVisitAt)}`
+                    : "Última visita: Sin registro";
+
+                const barDenom = Math.max(1, mobileCnt + desktopCnt + totalEntriesGame);
+                document.getElementById("adm-bar-mobile").style.width = `${Math.round((mobileCnt / barDenom) * 100)}%`;
+                document.getElementById("adm-bar-desktop").style.width = `${Math.round((desktopCnt / barDenom) * 100)}%`;
+                document.getElementById("adm-bar-entries").style.width = `${Math.round((totalEntriesGame / barDenom) * 100)}%`;
+
+                const logsBox = document.getElementById("adm-entry-logs-list");
+                const logs = Array.isArray(tr.entryLogs) ? tr.entryLogs : [];
+                if (!logs.length) {
+                    logsBox.innerHTML = '<p class="text-white/55 text-[11px]">Sin registros detallados de ingreso todavía.</p>';
+                } else {
+                    logsBox.innerHTML = logs.slice(0, 25).map((l) => {
+                        const isMobile = l.deviceType === "Celular";
+                        return `
+                            <div class="rounded-lg bg-black/50 border border-white/10 px-3 py-2 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                                <div class="space-x-1.5">
+                                    <span class="font-black text-white">${l.userLabel || "Visitante"}</span>
+                                    ${l.whatsapp ? `<span class="text-cyan-300">(${l.whatsapp})</span>` : ""}
+                                    <span class="text-amber-200 font-bold">· ${l.action}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2 py-0.5 rounded-full font-extrabold ${isMobile ? "bg-cyan-500/20 text-cyan-200 border border-cyan-300/35" : "bg-amber-400/20 text-yellow-200 border border-amber-300/35"}">
+                                        ${isMobile ? "📱 Celular" : "💻 Portátil / PC"}
+                                    </span>
+                                    <span class="text-white/60">${l.os || ""} ${l.browser ? "· " + l.browser : ""}</span>
+                                    <span class="text-white/65">${formatTimeStamp(l.ts)}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join("");
+                }
+
+                const usersArr = Object.values(state.users || {}).sort(
+                    (a, b) => Number(b.lastActiveAt || b.updatedAt || 0) - Number(a.lastActiveAt || a.updatedAt || 0)
+                );
+
+                renderAdminChat(usersArr);
+
+                const dailyCount = usersArr.filter((u) => (now - Number(u.lastActiveAt || u.createdAt || 0)) <= oneDayMs).length;
+                const weeklyCount = usersArr.filter((u) => (now - Number(u.lastActiveAt || u.createdAt || 0)) <= sevenDaysMs).length;
+                const activeCount = usersArr.filter((u) => getPresenceInfo(u).online).length;
+
+                const totalWagered = Number(state.settings.totalWagered) || 0;
+                const totalWon = Number(state.settings.totalWon) || 0;
+                const houseRetained = Number(state.settings.totalHouseRetained) || 0;
+                const houseNetGain = Math.max(0, totalWagered - totalWon) + houseRetained;
+
+                document.getElementById("adm-m-daily").textContent = String(dailyCount);
+                document.getElementById("adm-m-active").textContent = String(activeCount);
+                document.getElementById("adm-m-weekly").textContent = String(weeklyCount);
+                document.getElementById("adm-m-wagered").textContent = formatMoney(totalWagered);
+                document.getElementById("adm-m-won").textContent = formatMoney(totalWon);
+                document.getElementById("adm-m-house").textContent = formatMoney(houseNetGain);
+
+                const recharges = Array.isArray(state.rechargeRequests) ? state.rechargeRequests : [];
+                const withdrawals = Array.isArray(state.withdrawalRequests) ? state.withdrawalRequests : [];
+
+                const onlineBox = document.getElementById("adm-online-requests-list");
+                const onlineUsers = usersArr.filter((u) => getPresenceInfo(u).online);
+                if (!onlineUsers.length) {
+                    onlineBox.innerHTML = '<p class="text-white/60">No hay usuarios en línea en este momento.</p>';
+                } else {
+                    onlineBox.innerHTML = onlineUsers.map((u) => {
+                        const pendRec = recharges.filter((r) => r.userId === u.id && r.status === "pending");
+                        const pendWd = withdrawals.filter((w) => w.userId === u.id && w.status === "pending");
+                        const reqSummary = [];
+                        if (pendRec.length) reqSummary.push(`💳 Recarga pendiente (${formatMoney(pendRec[0].amount)})`);
+                        if (pendWd.length) reqSummary.push(`💸 Retiro pendiente (${formatMoney(pendWd[0].grossAmount)})`);
+                        const reqText = reqSummary.length ? reqSummary.join(" · ") : "Sin solicitudes pendientes";
+
+                        return `
+                            <div class="rounded-xl bg-black/45 border border-white/10 p-3 flex flex-wrap items-center justify-between gap-2">
+                                <div>
+                                    <span class="font-black text-white">${u.nick}</span>
+                                    <span class="text-white/70">(${u.whatsapp})</span>
+                                    <span class="ml-2 text-emerald-300 font-bold">En línea</span>
+                                </div>
+                                <div class="text-amber-200 font-bold">${reqText}</div>
+                            </div>
+                        `;
+                    }).join("");
+                }
+
+                const recBox = document.getElementById("adm-recharges-list");
+                if (!recharges.length) {
+                    recBox.innerHTML = '<p class="text-white/60">No hay solicitudes de recarga.</p>';
+                } else {
+                    recBox.innerHTML = recharges.map((req) => {
+                        const isPending = req.status === "pending";
+                        const uObj = state.users[req.userId];
+                        const pinShown = req.pin || (uObj ? uObj.pin : "N/A");
+                        const statusBadge = isPending
+                            ? '<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-200">Pendiente</span>'
+                            : (req.status === "denied"
+                                ? '<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-200">Denegada</span>'
+                                : '<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-200">Aprobada</span>');
+
+                        return `
+                            <div class="rounded-xl bg-black/45 border border-white/10 p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                                <div class="space-y-0.5">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="font-black text-white">Nick: ${req.nick || req.userName || "Jugador"}</span>
+                                        <span class="text-cyan-200">WA: ${req.whatsapp}</span>
+                                        <span class="text-amber-200 font-bold">PIN: ${pinShown}</span>
+                                        ${statusBadge}
+                                    </div>
+                                    <div class="text-emerald-300 font-extrabold">Valor: ${formatMoney(req.amount)} · 🕒 ${formatTimeStamp(req.createdAt)}${req.approvedAt ? ` · ✔ ${formatTimeStamp(req.approvedAt)}` : ""}</div>
+                                </div>
+                                ${isPending ? `
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <button type="button" data-approve-recharge="${req.id}" class="px-3.5 py-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-xs">
+                                            ✅ Aprobar
+                                        </button>
+                                        <button type="button" data-deny-recharge="${req.id}" class="px-3.5 py-2 rounded-xl bg-rose-500 hover:bg-rose-400 text-white font-black text-xs">
+                                            ❌ Denegar
+                                        </button>
+                                    </div>
+                                ` : `
+                                    <span class="${req.status === "denied" ? "text-rose-300" : "text-emerald-300"} font-bold text-xs shrink-0">${req.status === "denied" ? "✖ Denegada" : "✔ Aprobada"}</span>
+                                `}
+                            </div>
+                        `;
+                    }).join("");
+                }
+
+                const wdBox = document.getElementById("adm-withdrawals-list");
+                if (!withdrawals.length) {
+                    wdBox.innerHTML = '<p class="text-white/60">No hay solicitudes de retiro.</p>';
+                } else {
+                    wdBox.innerHTML = withdrawals.map((wd) => {
+                        const isPending = wd.status === "pending";
+                        const estadoLabel = isPending ? "Pendiente" : "Aprobado";
+                        return `
+                            <div class="rounded-xl bg-black/45 border border-white/10 p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                                <div class="space-y-0.5">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="font-black text-white">${wd.nick || wd.userName || "Jugador"}</span>
+                                        <span class="text-white/70">(${wd.whatsapp})</span>
+                                        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${isPending ? "bg-amber-400/20 text-amber-200" : "bg-emerald-500/20 text-emerald-200"}">${estadoLabel}</span>
+                                    </div>
+                                    <div class="text-amber-200 font-bold">
+                                        Solicitado: ${formatMoney(wd.grossAmount)} · <span class="text-emerald-300">70% Jugador: ${formatMoney(wd.netAmount)}</span> · <span class="text-pink-300">30% Casa: ${formatMoney(wd.houseAmount)}</span>
+                                    </div>
+                                    <div class="text-cyan-200">Destino: ${wd.account} · 🕒 Solicitado: ${formatTimeStamp(wd.createdAt)}${wd.approvedAt ? ` · ✔ Aprobado: ${formatTimeStamp(wd.approvedAt)}` : ""}</div>
+                                </div>
+                                ${isPending ? `
+                                    <button type="button" data-approve-withdraw="${wd.id}" class="px-3.5 py-2 rounded-xl bg-amber-300 hover:bg-amber-200 text-slate-950 font-black text-xs shrink-0">
+                                        ✅ Aprobar Retiro
+                                    </button>
+                                ` : `
+                                    <span class="text-emerald-300 font-bold text-xs shrink-0">✔ Aprobado</span>
+                                `}
+                            </div>
+                        `;
+                    }).join("");
+                }
+
+                const usrBox = document.getElementById("adm-users-list");
+                if (!usersArr.length) {
+                    usrBox.innerHTML = '<p class="text-white/60">Sin jugadores registrados aún.</p>';
+                } else {
+                    usrBox.innerHTML = usersArr.map((u) => {
+                        const pres = getPresenceInfo(u);
+                        const wag = Number(u.totalWagered) || 0;
+                        const won = Number(u.totalWon) || 0;
+                        const lossBalance = wag - won;
+                        const existingInput = document.querySelector(`[data-admin-credit-input="${u.id}"]`);
+                        const currentInputVal = existingInput ? existingInput.value : "0";
+                        return `
+                            <div class="rounded-xl bg-black/45 border border-white/10 p-3 space-y-2">
+                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="font-black text-sm text-white">${u.nick}</span>
+                                        <span class="text-xs font-bold text-emerald-200">${pres.label}</span>
+                                        <span class="text-white/70">WA: ${u.whatsapp} · PIN: ${u.pin}</span>
+                                    </div>
+                                    <span class="font-display text-base font-bold text-yellow-300">Saldo: ${formatMoney(u.balance)}</span>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] bg-white/5 rounded-xl p-2">
+                                    <div>Total Apostado: <strong class="text-cyan-300">${formatMoney(wag)}</strong></div>
+                                    <div>Total Premios: <strong class="text-emerald-300">${formatMoney(won)}</strong></div>
+                                    <div>Balance Pérdida Jugador: <strong class="${lossBalance >= 0 ? "text-pink-300" : "text-amber-300"}">${lossBalance >= 0 ? formatMoney(lossBalance) + " (perdió)" : "-" + formatMoney(Math.abs(lossBalance)) + " (ganó)"}</strong></div>
+                                </div>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <input type="number" min="1" step="1" value="${currentInputVal}" placeholder="Monto a acreditar" data-admin-credit-input="${u.id}" class="w-36 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-white/20 text-white font-bold text-xs">
+                                    <button type="button" data-admin-credit-btn="${u.id}" class="px-3 py-1.5 rounded-lg bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-xs">
+                                        + Acreditar
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join("");
+                }
+
+                document.getElementById("adm-cfg-dburl").value = DEFAULT_CLOUD_CONFIG.dbUrl;
+                document.getElementById("adm-cfg-room").value = state.settings.roomCode || DEFAULT_CLOUD_CONFIG.roomCode;
+                document.getElementById("adm-cfg-nequi").value = state.settings.nequiNumber || DEFAULT_CLOUD_CONFIG.nequiNumber;
+                document.getElementById("adm-cfg-wa-admin").value = state.settings.whatsappAdmin || DEFAULT_CLOUD_CONFIG.whatsappAdmin;
+                document.getElementById("adm-cfg-pin").value = state.settings.adminPin || DEFAULT_ADMIN_PIN;
+                updateSyncPills();
+            }
+
+            // ==================== INICIALIZACIÓN Y EVENTOS ====================
+            function wireEvents() {
+                document.getElementById("btn-music-toggle").addEventListener("click", () => {
+                    trackAudio.toggleEnabled();
+                });
+                document.getElementById("music-volume").addEventListener("input", (e) => {
+                    trackAudio.setVolume(e.target.value);
+                    trackAudio.playTrack();
+                });
+
+                document.getElementById("btn-open-bet-settings").addEventListener("click", () => {
+                    trackAudio.playTrack();
+                    updateHUD();
+                    document.getElementById("modal-bet-settings").classList.remove("hidden");
+                });
+
+                document.getElementById("btn-coins-panel").addEventListener("click", () => {
+                    trackAudio.playTrack();
+                    updateHUD();
+                    document.getElementById("modal-bet-settings").classList.remove("hidden");
+                });
+
+                document.getElementById("btn-quick-plus").addEventListener("click", () => {
+                    if (isSpinning) return;
+                    trackAudio.playTrack();
+                    const idx = BET_STEPS.findIndex((v) => v >= currentBet);
+                    const nextIdx = idx < 0 || idx >= BET_STEPS.length - 1 ? 0 : idx + 1;
+                    setTotalBetDirectly(BET_STEPS[nextIdx]);
+                    updateHUD();
+                });
+
+                document.getElementById("cfg-coins-minus").addEventListener("click", () => {
+                    const i = COINS_PER_LINE_OPTIONS.indexOf(coinsPerLine);
+                    if (i > 0) coinsPerLine = COINS_PER_LINE_OPTIONS[i - 1];
+                    syncBetFromCoins();
+                    updateHUD();
+                });
+
+                document.getElementById("cfg-coins-plus").addEventListener("click", () => {
+                    const i = COINS_PER_LINE_OPTIONS.indexOf(coinsPerLine);
+                    if (i < COINS_PER_LINE_OPTIONS.length - 1) coinsPerLine = COINS_PER_LINE_OPTIONS[i + 1];
+                    syncBetFromCoins();
+                    updateHUD();
+                });
+
+                document.getElementById("cfg-coinval-minus").addEventListener("click", () => {
+                    const i = COIN_VALUE_OPTIONS.indexOf(coinValue);
+                    if (i > 0) coinValue = COIN_VALUE_OPTIONS[i - 1];
+                    syncBetFromCoins();
+                    updateHUD();
+                });
+
+                document.getElementById("cfg-coinval-plus").addEventListener("click", () => {
+                    const i = COIN_VALUE_OPTIONS.indexOf(coinValue);
+                    if (i < COIN_VALUE_OPTIONS.length - 1) coinValue = COIN_VALUE_OPTIONS[i + 1];
+                    syncBetFromCoins();
+                    updateHUD();
+                });
+
+                document.getElementById("cfg-total-minus").addEventListener("click", () => {
+                    const idx = BET_STEPS.findIndex((v) => v >= currentBet);
+                    const nextIdx = idx <= 0 ? 0 : idx - 1;
+                    setTotalBetDirectly(BET_STEPS[nextIdx]);
+                    updateHUD();
+                });
+
+                document.getElementById("cfg-total-plus").addEventListener("click", () => {
+                    const idx = BET_STEPS.findIndex((v) => v >= currentBet);
+                    const nextIdx = idx < 0 || idx >= BET_STEPS.length - 1 ? BET_STEPS.length - 1 : idx + 1;
+                    setTotalBetDirectly(BET_STEPS[nextIdx]);
+                    updateHUD();
+                });
+
+                document.getElementById("btn-toggle-turbo-modal").addEventListener("click", () => {
+                    turboMode = !turboMode;
+                    updateSpinButtonState();
+                });
+
+                const spinBtn = document.getElementById("btn-spin");
+                const startHoldTurbo = () => {
+                    clearHoldTimer();
+                    holdTurboTimer = setTimeout(() => {
+                        turboMode = true;
+                        updateSpinButtonState();
+                        if (!isSpinning) handleSpin();
+                    }, 420);
+                };
+                spinBtn.addEventListener("mousedown", startHoldTurbo);
+                spinBtn.addEventListener("touchstart", startHoldTurbo, { passive: true });
+                spinBtn.addEventListener("mouseup", clearHoldTimer);
+                spinBtn.addEventListener("mouseleave", clearHoldTimer);
+                spinBtn.addEventListener("touchend", clearHoldTimer);
+                spinBtn.addEventListener("touchcancel", clearHoldTimer);
+                spinBtn.addEventListener("click", handleSpin);
+
+                document.getElementById("btn-auto-spin").addEventListener("click", () => {
+                    trackAudio.playTrack();
+                    if (autoSpinActive) {
+                        stopAutoSpin();
+                        notifyToast("Tirada automática detenida.", "info");
+                    } else {
+                        if (getCurrentBalance() < currentBet) {
+                            notifyToast("Saldo insuficiente para auto-giro.", "error");
+                            return;
+                        }
+                        autoSpinActive = true;
+                        updateSpinButtonState();
+                        notifyToast("Tirada automática activada.", "success");
+                        if (!isSpinning) handleSpin();
+                    }
+                });
+
+                document.getElementById("btn-start-demo").addEventListener("click", () => {
+                    enterWorkspace("demo");
+                });
+
+                document.getElementById("player-entry-form").addEventListener("submit", async (e) => {
+                    e.preventDefault();
+                    trackAudio.playTrack();
+
+                    const nick = document.getElementById("inp-nick").value.trim();
+                    const whatsapp = document.getElementById("inp-whatsapp").value.trim();
+                    const pin = document.getElementById("inp-pin").value.trim();
+                    const errEl = document.getElementById("entry-error");
+
+                    if (!nick || !/^\d{7,15}$/.test(cleanPhoneDigits(whatsapp)) || !/^\d{4}$/.test(pin)) {
+                        errEl.textContent = "Ingresa tu Nick, un número de WhatsApp válido y un PIN de 4 dígitos.";
+                        errEl.classList.remove("hidden");
+                        return;
+                    }
+                    errEl.classList.add("hidden");
+
+                    await pullFromRemote();
+
+                    const uid = `u_${cleanPhoneDigits(whatsapp)}`;
+                    const existing = state.users[uid];
+
+                    if (existing && existing.pin && existing.pin !== pin) {
+                        errEl.textContent = "El PIN ingresado no coincide con este número de WhatsApp.";
+                        errEl.classList.remove("hidden");
+                        return;
+                    }
+
+                    if (existing) {
+                        existing.nick = nick;
+                        existing.whatsapp = whatsapp;
+                        existing.recentBets = Array.isArray(existing.recentBets) ? existing.recentBets : [];
+                        existing.claimedSecretCombos = Array.isArray(existing.claimedSecretCombos) ? existing.claimedSecretCombos : [];
+                        existing.online = true;
+                        existing.isSpinning = false;
+                        existing.lastActiveAt = Date.now();
+                        existing.updatedAt = Date.now();
+                    } else {
+                        state.users[uid] = {
+                            id: uid,
+                            nick,
+                            whatsapp,
+                            pin,
+                            balance: 0,
+                            totalWagered: 0,
+                            totalWon: 0,
+                            totalWithdrawnGross: 0,
+                            totalWithdrawnNet: 0,
+                            spinsCount: 0,
+                            streakCount: 0,
+                            spin1500Count: 0,
+                            won1500FirstTime: false,
+                            spinsSince1500Win: 0,
+                            has30kRecharge: false,
+                            earlyHits30k: 0,
+                            spinsAfter30k: 0,
+                            won50Spins30kBonus: false,
+                            recentBets: [],
+                            claimedSecretCombos: [],
+                            appliedCreditIds: [],
+                            online: true,
+                            isSpinning: false,
+                            lastActiveAt: Date.now(),
+                            createdAt: Date.now(),
+                            updatedAt: Date.now(),
+                            rechargeAlert: null
+                        };
+                    }
+
+                    await enterWorkspace("real", uid);
+                });
+
+                document.getElementById("player-chat-form").addEventListener("submit", async (e) => {
+                    e.preventDefault();
+                    const inp = document.getElementById("player-chat-input");
+                    const txt = (inp.value || "").trim();
+                    if (!txt) return;
+                    const u = getActiveUser();
+                    const msg = {
+                        id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                        senderRole: "player",
+                        senderId: u ? u.id : "demo",
+                        senderName: u ? u.nick : "Modo Demo",
+                        targetUserId: "admin",
+                        text: txt,
+                        ts: Date.now()
+                    };
+                    state.chatMessages = mergeChatArrays(state.chatMessages, [msg]);
+                    inp.value = "";
+                    renderPlayerChat();
+                    await persistState(true);
+                    if (adminUnlocked) renderAdminPanel();
+                });
+
+                document.getElementById("adm-chat-form").addEventListener("submit", async (e) => {
+                    e.preventDefault();
+                    const inp = document.getElementById("adm-chat-input");
+                    const targetSel = document.getElementById("adm-chat-target");
+                    const txt = (inp.value || "").trim();
+                    if (!txt) return;
+                    const targetId = targetSel ? (targetSel.value || "all") : "all";
+                    const msg = {
+                        id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                        senderRole: "admin",
+                        senderId: "admin",
+                        senderName: "Admin",
+                        targetUserId: targetId,
+                        text: txt,
+                        ts: Date.now()
+                    };
+                    state.chatMessages = mergeChatArrays(state.chatMessages, [msg]);
+                    inp.value = "";
+                    renderAdminPanel();
+                    renderPlayerChat();
+                    await persistState(true);
+                });
+
+                document.getElementById("btn-refresh-balance").addEventListener("click", async () => {
+                    if (isSpinning) return;
+                    trackAudio.playTrack();
+                    await pullFromRemote();
+                    if (activeMode === "real") {
+                        const u = getActiveUser();
+                        if (u) applyPendingApprovedCreditsToUser(u);
+                        updateHUD();
+                        checkRechargeAlertBanner();
+                        notifyToast(`Saldo actualizado: ${formatMoney(getCurrentBalance())}`, "success");
+                    } else {
+                        updateHUD();
+                        notifyToast("Saldo demo actualizado.", "info");
+                    }
+                });
+
+                document.getElementById("btn-switch-user").addEventListener("click", () => {
+                    returnToEntryScreen();
+                });
+
+                document.getElementById("btn-dismiss-recharge-banner").addEventListener("click", () => {
+                    const u = getActiveUser();
+                    if (u) {
+                        u.rechargeAlert = null;
+                        u.updatedAt = Date.now();
+                        persistState(true);
+                    }
+                    document.getElementById("recharge-success-banner").classList.add("hidden");
+                });
+
+                document.querySelectorAll("[data-close-modal]").forEach((btn) => {
+                    btn.addEventListener("click", () => {
+                        document.getElementById(btn.getAttribute("data-close-modal")).classList.add("hidden");
+                    });
+                });
+
+                document.getElementById("btn-open-recharge").addEventListener("click", () => {
+                    trackAudio.playTrack();
+                    document.getElementById("recharge-feedback").classList.add("hidden");
+                    refreshRechargeModalLinks();
+                    document.getElementById("modal-recharge").classList.remove("hidden");
+                });
+
+                document.querySelectorAll("[data-recharge-preset]").forEach((btn) => {
+                    btn.addEventListener("click", () => {
+                        document.getElementById("recharge-amount").value = btn.getAttribute("data-recharge-preset");
+                        refreshRechargeModalLinks();
+                    });
+                });
+
+                document.getElementById("recharge-amount").addEventListener("input", refreshRechargeModalLinks);
+
+                document.getElementById("recharge-form").addEventListener("submit", async (e) => {
+                    e.preventDefault();
+                    const amt = Math.round(Number(document.getElementById("recharge-amount").value) || 0);
+                    const fb = document.getElementById("recharge-feedback");
+
+                    if (amt < MIN_RECHARGE) {
+                        fb.textContent = `La recarga mínima es de ${formatMoney(MIN_RECHARGE)} COP.`;
+                        fb.className = "rounded-xl px-3.5 py-2 text-xs font-bold bg-rose-500/25 text-rose-200 border border-rose-400/40";
+                        fb.classList.remove("hidden");
+                        return;
+                    }
+
+                    await pullFromRemote();
+
+                    const u = getActiveUser();
+                    const reqId = `rec_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+                    const req = {
+                        id: reqId,
+                        creditId: `cred_${reqId}`,
+                        userId: u ? u.id : "demo",
+                        nick: u ? u.nick : "Modo Demo",
+                        userName: u ? u.nick : "Modo Demo",
+                        whatsapp: u ? u.whatsapp : "N/A",
+                        pin: u ? u.pin : "N/A",
+                        nequiNumber: state.settings.nequiNumber || DEFAULT_CLOUD_CONFIG.nequiNumber,
+                        amount: amt,
+                        status: "pending",
+                        createdAt: Date.now()
+                    };
+
+                    state.rechargeRequests = mergeRequestArrays([req], state.rechargeRequests);
+                    if (u) u.updatedAt = Date.now();
+                    await persistState(true);
+                    refreshRechargeModalLinks();
+
+                    fb.textContent = "¡Solicitud enviada! En cuanto la aprueben te llega sola en unos 5 a 10 segundos.";
+                    fb.className = "rounded-xl px-3.5 py-2 text-xs font-bold bg-emerald-500/25 text-emerald-200 border border-emerald-400/40";
+                    fb.classList.remove("hidden");
+                    if (adminUnlocked) renderAdminPanel();
+                });
+
+                document.getElementById("btn-open-withdraw").addEventListener("click", () => {
+                    trackAudio.playTrack();
+                    document.getElementById("withdraw-feedback").classList.add("hidden");
+                    updateWithdrawBreakdown();
+                    document.getElementById("modal-withdraw").classList.remove("hidden");
+                });
+
+                document.querySelectorAll("[data-withdraw-preset]").forEach((btn) => {
+                    btn.addEventListener("click", () => {
+                        document.getElementById("withdraw-amount").value = btn.getAttribute("data-withdraw-preset");
+                        updateWithdrawBreakdown();
+                    });
+                });
+
+                document.getElementById("withdraw-amount").addEventListener("input", updateWithdrawBreakdown);
+
+                document.getElementById("withdraw-form").addEventListener("submit", async (e) => {
+                    e.preventDefault();
+                    const fb = document.getElementById("withdraw-feedback");
+                    if (activeMode !== "real") {
+                        fb.textContent = "Los retiros son para cuentas registradas.";
+                        fb.className = "rounded-xl px-3.5 py-2 text-xs font-bold bg-rose-500/25 text-rose-200 border border-rose-400/40";
+                        fb.classList.remove("hidden");
+                        return;
+                    }
+
+                    await pullFromRemote();
+
+                    const u = getActiveUser();
+                    const grossAmt = Math.round(Number(document.getElementById("withdraw-amount").value) || 0);
+                    const account = (document.getElementById("withdraw-account").value || "").trim();
+
+                    if (grossAmt < MIN_WITHDRAW || grossAmt > MAX_WITHDRAW) {
+                        fb.textContent = `El retiro debe ser entre ${formatMoney(MIN_WITHDRAW)} y ${formatMoney(MAX_WITHDRAW)} COP.`;
+                        fb.className = "rounded-xl px-3.5 py-2 text-xs font-bold bg-rose-500/25 text-rose-200 border border-rose-400/40";
+                        fb.classList.remove("hidden");
+                        return;
+                    }
+                    if (!account) {
+                        fb.textContent = "Ingresa tu cuenta de destino.";
+                        fb.className = "rounded-xl px-3.5 py-2 text-xs font-bold bg-rose-500/25 text-rose-200 border border-rose-400/40";
+                        fb.classList.remove("hidden");
+                        return;
+                    }
+                    if (!u || Number(u.balance) < grossAmt) {
+                        fb.textContent = "Saldo insuficiente para este retiro.";
+                        fb.className = "rounded-xl px-3.5 py-2 text-xs font-bold bg-rose-500/25 text-rose-200 border border-rose-400/40";
+                        fb.classList.remove("hidden");
+                        return;
+                    }
+
+                    const houseAmt = Math.round(grossAmt * HOUSE_RETENTION_SHARE);
+                    const netAmt = Math.max(0, grossAmt - houseAmt);
+
+                    u.balance = Number(u.balance) - grossAmt;
+                    u.totalWithdrawnGross = (Number(u.totalWithdrawnGross) || 0) + grossAmt;
+                    u.totalWithdrawnNet = (Number(u.totalWithdrawnNet) || 0) + netAmt;
+                    u.updatedAt = Date.now();
+
+                    state.settings.totalPaidOutNet = (Number(state.settings.totalPaidOutNet) || 0) + netAmt;
+                    state.settings.totalHouseRetained = (Number(state.settings.totalHouseRetained) || 0) + houseAmt;
+
+                    const wdItem = {
+                        id: `wd_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+                        userId: u.id,
+                        nick: u.nick,
+                        userName: u.nick,
+                        whatsapp: u.whatsapp,
+                        account,
+                        grossAmount: grossAmt,
+                        netAmount: netAmt,
+                        houseAmount: houseAmt,
+                        status: "pending",
+                        createdAt: Date.now()
+                    };
+
+                    state.withdrawalRequests = mergeRequestArrays([wdItem], state.withdrawalRequests);
+                    await persistState(true);
+                    updateHUD();
+                    if (adminUnlocked) renderAdminPanel();
+
+                    fb.textContent = `Retiro enviado. Recibes ${formatMoney(netAmt)} (70%) en ${account}.`;
+                    fb.className = "rounded-xl px-3.5 py-2 text-xs font-bold bg-emerald-500/25 text-emerald-200 border border-emerald-400/40";
+                    fb.classList.remove("hidden");
+                });
+
+                document.getElementById("btn-open-admin").addEventListener("click", async () => {
+                    trackAudio.playTrack();
+                    document.getElementById("admin-pin-error").classList.add("hidden");
+                    document.getElementById("admin-pin-input").value = "";
+                    document.getElementById("modal-admin").classList.remove("hidden");
+                    await pullFromRemote();
+                    renderAdminPanel();
+                });
+
+                document.getElementById("btn-adm-clear-history").addEventListener("click", clearRequestsHistory);
+                document.getElementById("btn-adm-clear-entries").addEventListener("click", clearEntryLogs);
+                document.getElementById("btn-adm-clear-chat").addEventListener("click", clearChatMessages);
+                document.getElementById("btn-adm-clear-recharges").addEventListener("click", clearRechargeRequests);
+                document.getElementById("btn-adm-clear-withdrawals").addEventListener("click", clearWithdrawalRequests);
+
+                document.getElementById("admin-pin-form").addEventListener("submit", async (e) => {
+                    e.preventDefault();
+                    const entered = (document.getElementById("admin-pin-input").value || "").trim();
+                    const expected = String(state.settings.adminPin || DEFAULT_ADMIN_PIN).trim();
+                    if (entered === expected) {
+                        adminUnlocked = true;
+                        document.getElementById("admin-pin-error").classList.add("hidden");
+                        await pullFromRemote();
+                        renderAdminPanel();
+                    } else {
+                        document.getElementById("admin-pin-error").classList.remove("hidden");
+                    }
+                });
+
+                document.getElementById("adm-recharges-list").addEventListener("click", async (e) => {
+                    const approveBtn = e.target.closest("[data-approve-recharge]");
+                    if (approveBtn) {
+                        approveBtn.disabled = true;
+                        const reqId = approveBtn.getAttribute("data-approve-recharge");
+                        const req = (state.rechargeRequests || []).find((r) => r.id === reqId);
+                        if (!req) {
+                            approveBtn.disabled = false;
+                            return;
+                        }
+                        if (req.userId === "demo") {
+                            req.status = "approved";
+                            req.approvedAt = Date.now();
+                            await persistState(true);
+                            renderAdminPanel();
+                            return;
+                        }
+                        await creditUserBalance(req.userId, req.amount, req.id);
+                        return;
+                    }
+
+                    const denyBtn = e.target.closest("[data-deny-recharge]");
+                    if (denyBtn) {
+                        denyBtn.disabled = true;
+                        const reqId = denyBtn.getAttribute("data-deny-recharge");
+                        const req = (state.rechargeRequests || []).find((r) => r.id === reqId);
+                        if (!req) {
+                            denyBtn.disabled = false;
+                            return;
+                        }
+                        req.status = "denied";
+                        req.deniedAt = Date.now();
+                        await persistState(true);
+                        renderAdminPanel();
+                        notifyToast(`Solicitud de recarga de ${formatMoney(req.amount)} denegada.`, "info");
+                    }
+                });
+
+                document.getElementById("adm-withdrawals-list").addEventListener("click", async (e) => {
+                    const btn = e.target.closest("[data-approve-withdraw]");
+                    if (!btn) return;
+                    btn.disabled = true;
+                    const wdId = btn.getAttribute("data-approve-withdraw");
+                    const wd = (state.withdrawalRequests || []).find((w) => w.id === wdId);
+                    if (!wd) {
+                        btn.disabled = false;
+                        return;
+                    }
+                    wd.status = "approved";
+                    wd.approvedAt = Date.now();
+                    await persistState(true);
+                    renderAdminPanel();
+                    notifyToast(`Retiro de ${formatMoney(wd.netAmount)} marcado como Aprobado.`, "success");
+                });
+
+                document.getElementById("adm-users-list").addEventListener("click", async (e) => {
+                    const btn = e.target.closest("[data-admin-credit-btn]");
+                    if (!btn) return;
+                    btn.disabled = true;
+                    const uid = btn.getAttribute("data-admin-credit-btn");
+                    const inp = document.querySelector(`[data-admin-credit-input="${uid}"]`);
+                    const amt = inp ? Number(inp.value) : 0;
+                    await creditUserBalance(uid, amt, null);
+                });
+
+                document.getElementById("btn-adm-save-cfg").addEventListener("click", async () => {
+                    state.settings.dbUrl = DEFAULT_CLOUD_CONFIG.dbUrl;
+                    state.settings.roomCode = (document.getElementById("adm-cfg-room").value || DEFAULT_CLOUD_CONFIG.roomCode).trim();
+                    state.settings.nequiNumber = (document.getElementById("adm-cfg-nequi").value || DEFAULT_CLOUD_CONFIG.nequiNumber).trim();
+                    state.settings.whatsappAdmin = (document.getElementById("adm-cfg-wa-admin").value || DEFAULT_CLOUD_CONFIG.whatsappAdmin).trim();
+                    const newPin = (document.getElementById("adm-cfg-pin").value || "").trim();
+                    if (newPin.length >= 4) state.settings.adminPin = newPin;
+                    await persistState(true);
+                    await pullFromRemote();
+                    renderAdminPanel();
+                    notifyToast("Configuración guardada.", "success");
+                });
+
+                document.getElementById("btn-adm-sync-now").addEventListener("click", async () => {
+                    await pullFromRemote();
+                    notifyToast("Sala sincronizada.", "info");
+                });
+
+                window.addEventListener("storage", (e) => {
+                    if (isSpinning) return;
+                    if (e.key && e.key.startsWith("EL_PROXIMO_GANADOR_V1_")) {
+                        mergeRemoteData(loadInitialState());
+                    }
+                });
+
+                window.addEventListener("resize", () => {
+                    drawSlotCanvas(currentGrid, activeWinCoords, activeWinLine, [false, false, false, false, false]);
+                });
+            }
+
+            window.addEventListener("DOMContentLoaded", async () => {
+                const bar = document.getElementById("loading-bar");
+                const statusTxt = document.getElementById("loading-status-text");
+
+                try {
+                    state.settings.dbUrl = DEFAULT_CLOUD_CONFIG.dbUrl;
+                    recordLinkVisit();
+                    wireEvents();
+                    refreshPaytableAmounts();
+                    trackAudio.syncUI();
+                    updateSyncPills();
+                    drawSlotCanvas(currentGrid, [], null, [false, false, false, false, false]);
+
+                    if (bar) bar.style.width = "65%";
+                    if (statusTxt) statusTxt.textContent = "Sincronizando con Firebase...";
+
+                    await pullFromRemote();
+                    recordLinkVisit();
+                    await pushToRemote();
+
+                    if (bar) bar.style.width = "100%";
+                    if (statusTxt) statusTxt.textContent = "¡Partida lista!";
+
+                    setTimeout(() => {
+                        document.getElementById("loading-screen").classList.add("hidden");
+                        document.getElementById("app-shell").classList.remove("hidden");
+                        drawSlotCanvas(currentGrid, [], null, [false, false, false, false, false]);
+                        if (activeMode === "real") checkRechargeAlertBanner();
+                    }, 350);
+
+                    setInterval(async () => {
+                        if (isSpinning || isSyncingNow) return;
+                        if (activeMode === "real") {
+                            const u = getActiveUser();
+                            if (u) {
+                                u.online = true;
+                                u.isSpinning = false;
+                                u.lastActiveAt = Date.now();
+                            }
+                        }
+                        await pullFromRemote();
+                    }, 5000);
+                } catch (err) {
+                    document.getElementById("loading-screen").classList.add("hidden");
+                    document.getElementById("app-shell").classList.remove("hidden");
+                }
+            });
+        })();
+    </script>
+</body>
+  </html>
