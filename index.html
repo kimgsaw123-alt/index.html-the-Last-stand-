@@ -3,432 +3,476 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>The Last Stand: AP — Calle Nocturna</title>
+<title>The Last Stand: Camino a Puerto Seguro</title>
 <style>
   * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
     -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
     user-select: none;
-    touch-action: none;
   }
 
   html, body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #060709;
+    background: #090b0e;
     font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-    color: #e8ecf2;
+    color: #eef2f6;
   }
 
-  #game-root {
+  #app {
     position: relative;
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #07080a;
+    background: #0b0d11;
   }
 
-  #three-canvas {
+  #game-canvas {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     display: block;
+    touch-action: none;
     z-index: 1;
   }
 
-  #fx-canvas {
+  /* HUD superior limpio durante la noche */
+  #hud-top {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    display: block;
-    pointer-events: none;
-    z-index: 2;
-  }
-
-  #terror-vignette {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 3;
-    background: radial-gradient(circle at center, transparent 42%, rgba(6, 7, 10, 0.72) 100%);
-  }
-
-  /* HUD minimalista para no tapar la acción */
-  .hud-top-left {
-    position: absolute;
-    top: 10px;
-    left: 14px;
-    z-index: 5;
-    pointer-events: none;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.95);
+    top: 8px;
+    left: 10px;
+    right: 10px;
+    z-index: 4;
     display: none;
+    justify-content: space-between;
+    align-items: flex-start;
+    pointer-events: none;
+    gap: 10px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95);
   }
 
-  .hud-zone {
+  #hud-top.active {
+    display: flex;
+  }
+
+  .hud-block {
+    background: rgba(12, 15, 20, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 6px;
+    padding: 6px 10px;
+    min-width: 138px;
+  }
+
+  .hud-title {
     font-size: 11px;
     font-weight: 800;
-    letter-spacing: 1.5px;
-    color: rgba(236, 240, 246, 0.92);
-    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #f4c26b;
   }
 
-  .hud-bar-track {
-    width: 96px;
-    height: 3px;
-    background: rgba(255, 255, 255, 0.16);
-    margin-top: 4px;
-    border-radius: 2px;
+  .hud-line {
+    font-size: 11px;
+    margin-top: 2px;
+    color: #e6ecf2;
+  }
+
+  .bar-wrap {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
     overflow: hidden;
+    margin-top: 4px;
   }
 
-  .hud-bar-fill {
+  #bar-hp-fill {
     height: 100%;
     width: 100%;
-    transition: width 0.12s linear, background-color 0.2s ease;
+    background: #48c774;
+    transition: width 0.1s linear, background-color 0.2s ease;
   }
 
-  #barricade-fill { background: #d99b43; }
-  #morale-fill { background: #52c488; }
-
-  .hud-top-right {
-    position: absolute;
-    top: 10px;
-    right: 14px;
-    z-index: 5;
-    pointer-events: none;
-    text-align: right;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.95);
-    display: none;
-  }
-
-  .hud-day {
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 1.4px;
-    color: #f3f5f8;
-  }
-
-  .hud-sub {
-    font-size: 10px;
-    font-weight: 600;
-    color: rgba(215, 222, 232, 0.78);
-    margin-top: 2px;
-  }
-
-  .hud-top-right .hud-bar-track {
-    margin-left: auto;
-    width: 86px;
-  }
-
-  #move-rail {
+  /* Selector de armas y controles táctiles en la noche */
+  #hud-bottom {
     position: absolute;
     left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 32px;
-    height: 152px;
-    border-radius: 16px;
-    background: rgba(12, 14, 18, 0.32);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    z-index: 5;
-    pointer-events: none;
+    right: 10px;
+    bottom: 8px;
+    z-index: 4;
     display: none;
-  }
-
-  #move-thumb {
-    position: absolute;
-    left: 3px;
-    top: 62px;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: rgba(217, 155, 67, 0.65);
-    border: 1px solid rgba(255, 245, 225, 0.75);
-  }
-
-  .hud-bottom-right {
-    position: absolute;
-    right: 14px;
-    bottom: 12px;
-    z-index: 6;
-    display: none;
+    justify-content: space-between;
     align-items: flex-end;
     gap: 8px;
-  }
-
-  .ammo-readout {
-    text-align: right;
-    margin-right: 4px;
     pointer-events: none;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.95);
   }
 
-  .ammo-weapon {
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    color: #e4b062;
-  }
-
-  .ammo-count {
-    font-size: 16px;
-    font-weight: 800;
-    color: #f4f6f9;
-  }
-
-  .tiny-btn {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    background: rgba(14, 16, 20, 0.55);
-    color: #f0f3f8;
-    font-size: 10px;
-    font-weight: 800;
+  #hud-bottom.active {
     display: flex;
-    align-items: center;
-    justify-content: center;
+  }
+
+  .weapon-bar {
+    display: flex;
+    gap: 6px;
+    pointer-events: auto;
+    flex-wrap: wrap;
+  }
+
+  .w-btn {
+    padding: 7px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(15, 18, 24, 0.82);
+    color: #dce3ec;
+    font-size: 11px;
+    font-weight: 700;
     cursor: pointer;
   }
 
-  .tiny-btn:active {
-    transform: scale(0.92);
-    background: rgba(217, 155, 67, 0.35);
+  .w-btn.active {
+    border-color: #f4c26b;
+    background: rgba(185, 118, 28, 0.42);
+    color: #fff6e0;
   }
 
-  .gameplay-active .hud-top-left,
-  .gameplay-active .hud-top-right,
-  .gameplay-active #move-rail,
-  .gameplay-active .hud-bottom-right {
+  .w-btn.locked {
+    opacity: 0.42;
+  }
+
+  .right-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    pointer-events: auto;
+  }
+
+  .ammo-box {
+    background: rgba(12, 15, 20, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 6px;
+    padding: 6px 10px;
+    text-align: right;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95);
+  }
+
+  .ammo-main {
+    font-size: 14px;
+    font-weight: 800;
+    color: #ffffff;
+  }
+
+  .ammo-sub {
+    font-size: 10px;
+    color: #f4c26b;
+  }
+
+  .act-btn {
+    padding: 9px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(24, 29, 38, 0.88);
+    color: #f4f7fa;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    cursor: pointer;
+  }
+
+  .act-btn:active {
+    transform: scale(0.95);
+  }
+
+  /* Panel de Fase de Día (12 horas) y Mapa de Ruta */
+  #day-panel {
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    background: rgba(9, 11, 15, 0.92);
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 12px 14px;
+    overflow-y: auto;
+  }
+
+  #day-panel.visible {
     display: flex;
   }
 
-  .gameplay-active .hud-top-left,
-  .gameplay-active .hud-top-right {
-    display: block;
+  .day-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    padding-bottom: 8px;
   }
 
-  #center-banner {
-    position: absolute;
-    top: 15%;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 6;
-    pointer-events: none;
+  .pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .pill {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 6px;
+    padding: 4px 9px;
+  }
+
+  .route-strip {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    margin: 10px 0;
+  }
+
+  .city-node {
+    background: rgba(20, 24, 32, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 6px;
+    padding: 6px;
+    font-size: 10px;
+    text-align: center;
+  }
+
+  .city-node.done {
+    border-color: rgba(72, 199, 116, 0.6);
+    background: rgba(32, 74, 48, 0.35);
+  }
+
+  .city-node.current {
+    border-color: #f4c26b;
+    background: rgba(168, 108, 24, 0.35);
+  }
+
+  .actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 8px;
+  }
+
+  .task-card {
+    background: rgba(18, 22, 30, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 8px;
+    padding: 9px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 6px;
+  }
+
+  .task-title {
     font-size: 12px;
     font-weight: 800;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #ffe8c2;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95);
-    opacity: 0;
-    transition: opacity 0.25s ease;
-    white-space: nowrap;
+    color: #f4c26b;
   }
 
-  /* Menú Principal */
-  #main-menu {
+  .task-desc {
+    font-size: 11px;
+    color: #cfd7e0;
+    line-height: 1.35;
+  }
+
+  .task-btn {
+    padding: 7px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(244, 194, 107, 0.5);
+    background: rgba(244, 194, 107, 0.16);
+    color: #fff6e0;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .task-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .day-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .travel-btn {
+    padding: 9px 14px;
+    border-radius: 6px;
+    border: 1px solid #48c774;
+    background: rgba(46, 138, 79, 0.32);
+    color: #e8fff0;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .travel-btn:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+  }
+
+  .night-btn {
+    padding: 10px 18px;
+    border-radius: 6px;
+    border: 1px solid #f4c26b;
+    background: rgba(212, 128, 24, 0.45);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.8px;
+    cursor: pointer;
+  }
+
+  /* Modal fin de partida / victoria */
+  #modal-end {
     position: absolute;
     inset: 0;
     z-index: 12;
-    background: radial-gradient(circle at 30% 45%, rgba(95, 28, 12, 0.24), rgba(6, 7, 10, 0.94) 72%);
-    display: flex;
+    background: rgba(7, 9, 12, 0.9);
+    display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 12px;
     padding: 20px;
-  }
-
-  #main-menu.hidden {
-    display: none;
-  }
-
-  .menu-title {
-    font-size: 24px;
-    font-weight: 900;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: #f3f5f8;
-    text-shadow: 0 4px 16px rgba(0, 0, 0, 0.9);
-  }
-
-  .menu-sub {
-    font-size: 11px;
-    letter-spacing: 1.5px;
-    color: rgba(225, 178, 108, 0.85);
-    margin-bottom: 6px;
-    text-transform: uppercase;
-  }
-
-  .menu-btn {
-    width: 210px;
-    padding: 11px 18px;
-    border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(18, 21, 27, 0.78);
-    color: #f2f5f9;
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    cursor: pointer;
-  }
-
-  .menu-btn.primary {
-    border-color: rgba(225, 165, 76, 0.75);
-    background: rgba(168, 96, 24, 0.36);
-    color: #fff2dc;
-  }
-
-  .menu-btn:active {
-    transform: scale(0.97);
-  }
-
-  /* Panel de Opciones */
-  #options-panel {
-    position: absolute;
-    inset: 0;
-    z-index: 14;
-    background: rgba(7, 8, 11, 0.92);
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    padding: 20px;
-  }
-
-  #options-panel.visible {
-    display: flex;
-  }
-
-  .quality-row {
-    display: flex;
-    gap: 8px;
-  }
-
-  .q-btn {
-    padding: 9px 16px;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(22, 25, 32, 0.85);
-    color: #dce2ea;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 1.2px;
-    cursor: pointer;
-  }
-
-  .q-btn.active {
-    border-color: #e4b062;
-    background: rgba(180, 112, 32, 0.45);
-    color: #fff5e2;
-  }
-
-  /* Pantalla Fin / Derrota */
-  #end-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 13;
-    background: rgba(7, 8, 10, 0.82);
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
     text-align: center;
   }
 
-  #end-overlay.visible {
+  #modal-end.visible {
     display: flex;
   }
 
-  #end-title {
-    font-size: 20px;
+  #end-heading {
+    font-size: 22px;
     font-weight: 900;
-    letter-spacing: 2px;
-    color: #e65c4f;
+    letter-spacing: 1.5px;
   }
 
-  #end-stats {
-    font-size: 12px;
-    color: rgba(235, 238, 243, 0.88);
+  #end-detail {
+    font-size: 13px;
+    max-width: 440px;
     line-height: 1.5;
+    color: #dce3ec;
   }
 </style>
-<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 </head>
 <body>
-<div id="game-root">
-  <canvas id="three-canvas"></canvas>
-  <canvas id="fx-canvas"></canvas>
-  <div id="terror-vignette"></div>
+<div id="app">
+  <canvas id="game-canvas"></canvas>
 
-  <div class="hud-top-left">
-    <div class="hud-zone" id="map-label">DÍAS 1–5 · CALLE EN LLAMAS</div>
-    <div class="hud-bar-track"><div id="barricade-fill" class="hud-bar-fill"></div></div>
-    <div class="hud-sub" id="barricade-label">BARRICADA 100%</div>
-  </div>
-
-  <div class="hud-top-right">
-    <div class="hud-day" id="day-label">DÍA 1 · NOCHE 1</div>
-    <div class="hud-bar-track"><div id="morale-fill" class="hud-bar-fill"></div></div>
-    <div class="hud-sub" id="horde-label">HORDA: 100 · BAJAS: 0</div>
-  </div>
-
-  <div id="move-rail">
-    <div id="move-thumb"></div>
-  </div>
-
-  <div id="center-banner"></div>
-
-  <div class="hud-bottom-right">
-    <div class="ammo-readout">
-      <div class="ammo-weapon" id="weapon-name">FN SCAR-L</div>
-      <div class="ammo-count" id="ammo-count">30 / ∞</div>
+  <!-- HUD Nocturno -->
+  <div id="hud-top">
+    <div class="hud-block">
+      <div class="hud-title" id="hud-city">CIUDAD 1 · SALIDA</div>
+      <div class="hud-line" id="hud-bar-text">Barricada: 100 / 100</div>
+      <div class="bar-wrap"><div id="bar-hp-fill"></div></div>
     </div>
-    <button class="tiny-btn" id="btn-reload" type="button">REC</button>
-    <button class="tiny-btn" id="btn-weapon" type="button">CAMB</button>
-    <button class="tiny-btn" id="btn-fs-hud" type="button">FS</button>
-    <button class="tiny-btn" id="btn-menu-hud" type="button">MENÚ</button>
-  </div>
 
-  <!-- Menú Principal -->
-  <div id="main-menu">
-    <div class="menu-title">THE LAST STAND · AP</div>
-    <div class="menu-sub">CALLE NOCTURNA · SUPERVIVENCIA EXTREMA</div>
-    <button class="menu-btn primary" id="btn-new" type="button">NEW</button>
-    <button class="menu-btn" id="btn-options" type="button">OPTIONS</button>
-    <button class="menu-btn" id="btn-fullscreen" type="button">FULL SCREEN</button>
-    <button class="menu-btn" id="btn-exit" type="button">SALIR</button>
-  </div>
-
-  <!-- Opciones de Calidad -->
-  <div id="options-panel">
-    <div class="menu-title" style="font-size: 18px;">OPTIONS</div>
-    <div class="menu-sub">CALIDAD GRÁFICA</div>
-    <div class="quality-row">
-      <button class="q-btn" data-q="low" type="button">BAJA</button>
-      <button class="q-btn" data-q="medium" type="button">MEDIA</button>
-      <button class="q-btn" data-q="high" type="button">ALTA</button>
+    <div class="hud-block" style="text-align: center;">
+      <div class="hud-title" id="hud-timer">AMANECER: 60s</div>
+      <div class="hud-line" id="hud-day-countdown">Día 1 / 40 · Aliados: 0</div>
     </div>
-    <button class="menu-btn primary" id="btn-options-back" type="button" style="margin-top: 8px;">GUARDAR Y VOLVER</button>
+
+    <div class="hud-block" style="text-align: right;">
+      <div class="hud-title" id="hud-supplies">SUMINISTROS: 0</div>
+      <div class="hud-line" id="hud-kills">Bajas: 0</div>
+    </div>
   </div>
 
-  <!-- Fin de partida -->
-  <div id="end-overlay">
-    <div id="end-title">CAÍSTE EN LA NIEBLA</div>
-    <div id="end-stats"></div>
-    <button class="menu-btn primary" id="retry-btn" type="button">NEW (REINTENTAR)</button>
-    <button class="menu-btn" id="end-to-menu" type="button">MENÚ</button>
+  <div id="hud-bottom">
+    <div class="weapon-bar" id="weapon-bar"></div>
+    <div class="right-controls">
+      <div class="ammo-box">
+        <div class="ammo-main" id="ammo-display">12 / 12</div>
+        <div class="ammo-sub" id="weapon-label">PISTOLA</div>
+      </div>
+      <button class="act-btn" id="btn-reload" type="button">RECARGAR (R)</button>
+      <button class="act-btn" id="btn-sound" type="button">SFX ON</button>
+    </div>
+  </div>
+
+  <!-- Panel Fase de Día (12 Horas) -->
+  <div id="day-panel">
+    <div>
+      <div class="day-header">
+        <div>
+          <strong id="day-panel-title" style="font-size: 15px; color: #f4c26b;">DÍA 1 · FASE DIURNA</strong>
+          <div style="font-size: 11px; color: #b8c2ce;">Meta: llegar a Puerto Seguro antes del Día 40</div>
+        </div>
+        <div class="pill-row">
+          <div class="pill" id="pill-hours">Horas: 12 / 12</div>
+          <div class="pill" id="pill-days-left">Días restantes: 40</div>
+          <div class="pill" id="pill-supplies">Suministros: 0</div>
+          <div class="pill" id="pill-hp">Barricada: 100%</div>
+          <div class="pill" id="pill-allies">Sobrevivientes: 0</div>
+        </div>
+      </div>
+
+      <div class="route-strip" id="route-strip"></div>
+
+      <div class="actions-grid">
+        <div class="task-card">
+          <div>
+            <div class="task-title">a) Reparar Barricada (2h)</div>
+            <div class="task-desc">Refuerza madera y metal. Recupera +28 de resistencia de barricada.</div>
+          </div>
+          <button class="task-btn" id="act-repair" type="button">ASIGNAR 2 HORAS</button>
+        </div>
+
+        <div class="task-card">
+          <div>
+            <div class="task-title">b) Buscar Armas (3h)</div>
+            <div class="task-desc" id="desc-weapons">Desbloquea o mejora Escopeta, Rifle de Asalto y Francotirador.</div>
+          </div>
+          <button class="task-btn" id="act-weapons" type="button">ASIGNAR 3 HORAS</button>
+        </div>
+
+        <div class="task-card">
+          <div>
+            <div class="task-title">c) Buscar Suministros (2h)</div>
+            <div class="task-desc">Consigue +3 Suministros de Viaje (comida y gasolina para avanzar entre ciudades).</div>
+          </div>
+          <button class="task-btn" id="act-supplies" type="button">ASIGNAR 2 HORAS</button>
+        </div>
+
+        <div class="task-card">
+          <div>
+            <div class="task-title">d) Buscar Sobrevivientes (3h)</div>
+            <div class="task-desc">Recluta un aliado que defiende la barricada y dispara automáticamente de noche.</div>
+          </div>
+          <button class="task-btn" id="act-allies" type="button">ASIGNAR 3 HORAS</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-footer">
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+        <button class="travel-btn" id="btn-travel" type="button">VIAJAR</button>
+        <button class="act-btn" id="btn-reset-save" type="button">NUEVA PARTIDA</button>
+      </div>
+      <button class="night-btn" id="btn-start-night" type="button">INICIAR NOCHE (60s)</button>
+    </div>
+  </div>
+
+  <!-- Pantalla Final -->
+  <div id="modal-end">
+    <div id="end-heading">FIN DE LA PARTIDA</div>
+    <div id="end-detail"></div>
+    <button class="night-btn" id="btn-restart-end" type="button">EMPEZAR NUEVA PARTIDA</button>
   </div>
 </div>
 
@@ -436,1230 +480,983 @@
 (() => {
   'use strict';
 
-  /* =========================================================
-     1. CONFIGURACIÓN PERSISTENTE (CALIDAD BAJA / MEDIA / ALTA)
-     ========================================================= */
-  const STORAGE_KEY = 'tls_ap_options_v1';
-  const QUALITY_PRESETS = {
-    low:    { pixelRatio: 0.85, shadows: false, fogDensity: 0.036, maxParticles: 24,  fireLight: 1.4,  starCount: 28 },
-    medium: { pixelRatio: 1.25, shadows: true,  fogDensity: 0.044, maxParticles: 55,  fireLight: 2.8,  starCount: 55 },
-    high:   { pixelRatio: 1.85, shadows: true,  fogDensity: 0.052, maxParticles: 110, fireLight: 4.2,  starCount: 95 }
-  };
+  const SAVE_KEY = 'last_stand_2d_puerto_seguro_v1';
+  const MAX_DAYS = 40;
+  const DAY_HOURS_TOTAL = 12;
+  const NIGHT_DURATION = 60;
 
-  let currentQuality = 'medium';
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-    if (saved.quality && QUALITY_PRESETS[saved.quality]) {
-      currentQuality = saved.quality;
+  const CITIES = [
+    { name: 'Ciudad 1: Salida', reqSupplies: 6, travelDays: 2 },
+    { name: 'Ciudad 2: Ruinas', reqSupplies: 12, travelDays: 3 },
+    { name: 'Ciudad 3: Puente', reqSupplies: 18, travelDays: 3 },
+    { name: 'Ciudad 4: Estación', reqSupplies: 25, travelDays: 4 },
+    { name: 'Ciudad 5: Puerto Seguro', reqSupplies: 0, travelDays: 0 }
+  ];
+
+  const WEAPON_DEFS = [
+    {
+      key: 'pistol',
+      label: '1. Pistola',
+      unlocked: true,
+      level: 1,
+      damage: 24,
+      fireDelay: 0.22,
+      mag: 15,
+      reloadTime: 0.85,
+      infiniteReserve: true
+    },
+    {
+      key: 'shotgun',
+      label: '2. Escopeta',
+      unlocked: false,
+      level: 1,
+      damage: 16,
+      pellets: 6,
+      spread: 0.24,
+      fireDelay: 0.68,
+      mag: 6,
+      reloadTime: 1.35,
+      infiniteReserve: true
+    },
+    {
+      key: 'rifle',
+      label: '3. Asalto',
+      unlocked: false,
+      level: 1,
+      damage: 21,
+      fireDelay: 0.11,
+      mag: 30,
+      reloadTime: 1.25,
+      infiniteReserve: true
+    },
+    {
+      key: 'sniper',
+      label: '4. Francotirador',
+      unlocked: false,
+      level: 1,
+      damage: 95,
+      pierce: 3,
+      fireDelay: 0.85,
+      mag: 5,
+      reloadTime: 1.6,
+      infiniteReserve: true
     }
-  } catch (_) {}
-
-  function saveQuality(q) {
-    currentQuality = q;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ quality: q }));
-    } catch (_) {}
-    applyQualitySettings();
-    syncQualityButtons();
-  }
-
-  function syncQualityButtons() {
-    document.querySelectorAll('.q-btn').forEach((btn) => {
-      btn.classList.toggle('active', btn.dataset.q === currentQuality);
-    });
-  }
+  ];
 
   /* =========================================================
-     2. AUDIO PROCEDURAL ENVOLVENTE (SCAR-L, GLOCK 19 Y TERROR)
+     AUDIO PROCEDURAL LIGERO (WEB AUDIO API)
      ========================================================= */
-  class HorrorAudioEngine {
+  class SoundFX {
     constructor() {
       this.ctx = null;
-      this.noiseBuffer = null;
-      this.ambientStarted = false;
-      this.ambientGain = null;
-      this.fireGain = null;
-      this.lastGroan = 0;
+      this.enabled = true;
+      this.noise = null;
     }
 
-    unlock() {
+    ensure() {
       if (!this.ctx) {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return;
-        this.ctx = new AudioCtx();
-
-        const len = this.ctx.sampleRate * 2.0;
-        this.noiseBuffer = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
-        const ch = this.noiseBuffer.getChannelData(0);
-        for (let i = 0; i < len; i++) {
-          ch[i] = Math.random() * 2 - 1;
-        }
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        this.ctx = new AC();
+        const buf = this.ctx.createBuffer(1, this.ctx.sampleRate * 0.6, this.ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+        this.noise = buf;
       }
-      if (this.ctx.state === 'suspended') {
-        this.ctx.resume().catch(() => {});
+      if (this.ctx.state === 'suspended') this.ctx.resume().catch(() => {});
+    }
+
+    toggle() {
+      this.enabled = !this.enabled;
+      return this.enabled;
+    }
+
+    shot(wKey) {
+      if (!this.enabled || !this.ctx || !this.noise) return;
+      const now = this.ctx.currentTime;
+      const src = this.ctx.createBufferSource();
+      src.buffer = this.noise;
+
+      const filter = this.ctx.createBiquadFilter();
+      const gain = this.ctx.createGain();
+
+      if (wKey === 'shotgun') {
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(1100, now);
+        gain.gain.setValueAtTime(0.28, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+      } else if (wKey === 'sniper') {
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(920, now);
+        gain.gain.setValueAtTime(0.32, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+      } else if (wKey === 'rifle') {
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(1550, now);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+      } else {
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(2100, now);
+        gain.gain.setValueAtTime(0.16, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
       }
-      this.startAmbientHorror();
+
+      src.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+      src.start(now);
+      src.stop(now + 0.23);
     }
 
-    startAmbientHorror() {
-      if (this.ambientStarted || !this.ctx || !this.noiseBuffer) return;
-      this.ambientStarted = true;
-      const now = this.ctx.currentTime;
-
-      // Viento nocturno helado filtrándose entre edificios
-      const wind = this.ctx.createBufferSource();
-      wind.buffer = this.noiseBuffer;
-      wind.loop = true;
-
-      const windFilter = this.ctx.createBiquadFilter();
-      windFilter.type = 'bandpass';
-      windFilter.frequency.setValueAtTime(340, now);
-      windFilter.Q.setValueAtTime(4.5, now);
-
-      const lfo = this.ctx.createOscillator();
-      lfo.type = 'sine';
-      lfo.frequency.setValueAtTime(0.11, now);
-      const lfoGain = this.ctx.createGain();
-      lfoGain.gain.setValueAtTime(190, now);
-      lfo.connect(lfoGain);
-      lfoGain.connect(windFilter.frequency);
-
-      this.ambientGain = this.ctx.createGain();
-      this.ambientGain.gain.setValueAtTime(0.085, now);
-
-      wind.connect(windFilter);
-      windFilter.connect(this.ambientGain);
-      this.ambientGain.connect(this.ctx.destination);
-
-      wind.start(now);
-      lfo.start(now);
-
-      // Crepitar grave de carro incendiado
-      const fire = this.ctx.createBufferSource();
-      fire.buffer = this.noiseBuffer;
-      fire.loop = true;
-
-      const fireFilter = this.ctx.createBiquadFilter();
-      fireFilter.type = 'lowpass';
-      fireFilter.frequency.setValueAtTime(520, now);
-
-      this.fireGain = this.ctx.createGain();
-      this.fireGain.gain.setValueAtTime(0.065, now);
-
-      fire.connect(fireFilter);
-      fireFilter.connect(this.fireGain);
-      this.fireGain.connect(this.ctx.destination);
-      fire.start(now);
-
-      // Dron grave de terror psicológico
-      const drone = this.ctx.createOscillator();
-      drone.type = 'sawtooth';
-      drone.frequency.setValueAtTime(46, now);
-
-      const droneFilter = this.ctx.createBiquadFilter();
-      droneFilter.type = 'lowpass';
-      droneFilter.frequency.setValueAtTime(95, now);
-
-      const droneGain = this.ctx.createGain();
-      droneGain.gain.setValueAtTime(0.04, now);
-
-      drone.connect(droneFilter);
-      droneFilter.connect(droneGain);
-      droneGain.connect(this.ctx.destination);
-      drone.start(now);
-    }
-
-    setAmbientActive(active) {
-      if (!this.ctx || !this.ambientGain || !this.fireGain) return;
-      const now = this.ctx.currentTime;
-      this.ambientGain.gain.setTargetAtTime(active ? 0.095 : 0.03, now, 0.15);
-      this.fireGain.gain.setTargetAtTime(active ? 0.075 : 0.02, now, 0.15);
-    }
-
-    // Sonido característico del FN SCAR-L (golpe grave de recámara + estampido seco de fusil)
-    playScarShot() {
-      if (!this.ctx || !this.noiseBuffer) return;
-      const now = this.ctx.currentTime;
-
-      const blast = this.ctx.createBufferSource();
-      blast.buffer = this.noiseBuffer;
-
-      const bp = this.ctx.createBiquadFilter();
-      bp.type = 'bandpass';
-      bp.frequency.setValueAtTime(1180, now);
-      bp.frequency.exponentialRampToValueAtTime(420, now + 0.16);
-      bp.Q.setValueAtTime(0.85, now);
-
-      const blastGain = this.ctx.createGain();
-      blastGain.gain.setValueAtTime(0.45, now);
-      blastGain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
-
-      blast.connect(bp);
-      bp.connect(blastGain);
-      blastGain.connect(this.ctx.destination);
-      blast.start(now);
-      blast.stop(now + 0.19);
-
-      // Golpe de pistón / cerrojo característico del SCAR
-      const thump = this.ctx.createOscillator();
-      const thumpGain = this.ctx.createGain();
-      thump.type = 'triangle';
-      thump.frequency.setValueAtTime(125, now);
-      thump.frequency.exponentialRampToValueAtTime(34, now + 0.11);
-      thumpGain.gain.setValueAtTime(0.38, now);
-      thumpGain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-
-      thump.connect(thumpGain);
-      thumpGain.connect(this.ctx.destination);
-      thump.start(now);
-      thump.stop(now + 0.13);
-    }
-
-    // Sonido característico de Glock 19 (chasquido rápido y limpio de corredera + golpe 9mm)
-    playGlockShot() {
-      if (!this.ctx || !this.noiseBuffer) return;
-      const now = this.ctx.currentTime;
-
-      const snap = this.ctx.createBufferSource();
-      snap.buffer = this.noiseBuffer;
-
-      const hp = this.ctx.createBiquadFilter();
-      hp.type = 'bandpass';
-      hp.frequency.setValueAtTime(2450, now);
-      hp.Q.setValueAtTime(1.4, now);
-
-      const snapGain = this.ctx.createGain();
-      snapGain.gain.setValueAtTime(0.3, now);
-      snapGain.gain.exponentialRampToValueAtTime(0.001, now + 0.085);
-
-      snap.connect(hp);
-      hp.connect(snapGain);
-      snapGain.connect(this.ctx.destination);
-      snap.start(now);
-      snap.stop(now + 0.09);
-
-      const crack = this.ctx.createOscillator();
-      const crackGain = this.ctx.createGain();
-      crack.type = 'sine';
-      crack.frequency.setValueAtTime(210, now);
-      crack.frequency.exponentialRampToValueAtTime(52, now + 0.065);
-      crackGain.gain.setValueAtTime(0.25, now);
-      crackGain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
-
-      crack.connect(crackGain);
-      crackGain.connect(this.ctx.destination);
-      crack.start(now);
-      crack.stop(now + 0.075);
-    }
-
-    playReload(isScar) {
-      if (!this.ctx) return;
-      const now = this.ctx.currentTime;
-      const base = isScar ? 440 : 680;
-      [0, 0.22].forEach((delay, idx) => {
-        const osc = this.ctx.createOscillator();
-        const g = this.ctx.createGain();
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(idx === 0 ? base : base * 1.35, now + delay);
-        osc.frequency.exponentialRampToValueAtTime(base * 0.45, now + delay + 0.06);
-        g.gain.setValueAtTime(0.08, now + delay);
-        g.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.065);
-        osc.connect(g);
-        g.connect(this.ctx.destination);
-        osc.start(now + delay);
-        osc.stop(now + delay + 0.07);
-      });
-    }
-
-    playHit(headshot) {
-      if (!this.ctx) return;
+    hit(crit) {
+      if (!this.enabled || !this.ctx) return;
       const now = this.ctx.currentTime;
       const osc = this.ctx.createOscillator();
       const g = this.ctx.createGain();
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(headshot ? 360 : 150, now);
-      osc.frequency.exponentialRampToValueAtTime(48, now + 0.06);
-      g.gain.setValueAtTime(headshot ? 0.14 : 0.08, now);
+      osc.type = crit ? 'triangle' : 'sine';
+      osc.frequency.setValueAtTime(crit ? 440 : 170, now);
+      osc.frequency.exponentialRampToValueAtTime(55, now + 0.06);
+      g.gain.setValueAtTime(crit ? 0.12 : 0.07, now);
       g.gain.exponentialRampToValueAtTime(0.001, now + 0.065);
       osc.connect(g);
       g.connect(this.ctx.destination);
       osc.start(now);
       osc.stop(now + 0.07);
     }
-
-    playZombieGroan(timeSec) {
-      if (!this.ctx || timeSec - this.lastGroan < 3.4) return;
-      this.lastGroan = timeSec;
-      const now = this.ctx.currentTime;
-      const osc = this.ctx.createOscillator();
-      const g = this.ctx.createGain();
-      osc.type = 'sawtooth';
-      const startFreq = 72 + Math.random() * 26;
-      osc.frequency.setValueAtTime(startFreq, now);
-      osc.frequency.linearRampToValueAtTime(startFreq * 0.72, now + 0.65);
-
-      const filter = this.ctx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(240, now);
-
-      g.gain.setValueAtTime(0.001, now);
-      g.gain.linearRampToValueAtTime(0.065, now + 0.15);
-      g.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
-
-      osc.connect(filter);
-      filter.connect(g);
-      g.connect(this.ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.72);
-    }
   }
 
   /* =========================================================
-     3. TEXTURAS PROCEDURALES REALISTAS (Ropa, Asfalto, Metal)
+     ESTADO DEL JUEGO Y GUARDADO EN LOCALSTORAGE
      ========================================================= */
-  function makeFabricTexture(baseHex, accentHex, noiseAlpha = 0.25) {
-    const c = document.createElement('canvas');
-    c.width = 256;
-    c.height = 256;
-    const g = c.getContext('2d');
-    g.fillStyle = baseHex;
-    g.fillRect(0, 0, 256, 256);
-
-    // Trama de tela / ripstop
-    g.strokeStyle = 'rgba(0,0,0,0.22)';
-    g.lineWidth = 1;
-    for (let i = 0; i < 256; i += 4) {
-      g.beginPath();
-      g.moveTo(i, 0); g.lineTo(i, 256);
-      g.moveTo(0, i); g.lineTo(256, i);
-      g.stroke();
-    }
-
-    // Manchas orgánicas de desgaste / camuflaje sutil
-    for (let i = 0; i < 48; i++) {
-      g.fillStyle = accentHex;
-      g.globalAlpha = noiseAlpha * (0.3 + Math.random() * 0.7);
-      g.beginPath();
-      g.ellipse(
-        Math.random() * 256,
-        Math.random() * 256,
-        8 + Math.random() * 22,
-        5 + Math.random() * 14,
-        Math.random() * Math.PI,
-        0,
-        Math.PI * 2
-      );
-      g.fill();
-    }
-    g.globalAlpha = 1;
-
-    const tex = new THREE.CanvasTexture(c);
-    tex.wrapS = THREE.RepeatWrapping;
-    tex.wrapT = THREE.RepeatWrapping;
-    return tex;
-  }
-
-  function makeAsphaltTexture() {
-    const c = document.createElement('canvas');
-    c.width = 512;
-    c.height = 512;
-    const g = c.getContext('2d');
-    g.fillStyle = '#1e2126';
-    g.fillRect(0, 0, 512, 512);
-
-    for (let i = 0; i < 6500; i++) {
-      const v = 24 + Math.floor(Math.random() * 26);
-      g.fillStyle = `rgb(${v},${v + 1},${v + 4})`;
-      g.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
-    }
-
-    // Líneas viales desgastadas
-    g.fillStyle = 'rgba(185, 175, 130, 0.16)';
-    g.fillRect(0, 170, 512, 5);
-    g.fillRect(0, 340, 512, 5);
-
-    const tex = new THREE.CanvasTexture(c);
-    tex.wrapS = THREE.RepeatWrapping;
-    tex.wrapT = THREE.RepeatWrapping;
-    tex.repeat.set(4, 2);
-    return tex;
-  }
-
-  /* =========================================================
-     4. ESCENA 3D (CALLE NOCTURNA, CARRO EN LLAMAS, 3 LÍNEAS)
-     ========================================================= */
-  const threeCanvas = document.getElementById('three-canvas');
-  const fxCanvas = document.getElementById('fx-canvas');
-  const fxCtx = fxCanvas.getContext('2d');
-  const audio = new HorrorAudioEngine();
-
-  const renderer = new THREE.WebGLRenderer({
-    canvas: threeCanvas,
-    antialias: true,
-    powerPreference: 'high-performance'
-  });
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.02;
-
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x06080b);
-  const fog = new THREE.FogExp2(0x080a0e, QUALITY_PRESETS[currentQuality].fogDensity);
-  scene.fog = fog;
-
-  const camera = new THREE.PerspectiveCamera(45, 16 / 9, 0.1, 85);
-  const baseCamPos = new THREE.Vector3(0.5, 6.4, 12.2);
-  const baseCamLook = new THREE.Vector3(-0.7, 0.85, 0.0);
-  camera.position.copy(baseCamPos);
-  camera.lookAt(baseCamLook);
-
-  // Luz nocturna fría y abrumadora + fuego del carro incendiado
-  const hemiLight = new THREE.HemisphereLight(0x2c394d, 0x0c0d10, 0.52);
-  scene.add(hemiLight);
-
-  const moonLight = new THREE.DirectionalLight(0x637b9c, 0.72);
-  moonLight.position.set(-5, 12, 6);
-  moonLight.castShadow = true;
-  moonLight.shadow.mapSize.set(1024, 1024);
-  scene.add(moonLight);
-
-  const burningCarLight = new THREE.PointLight(0xff5a1f, QUALITY_PRESETS[currentQuality].fireLight, 14);
-  burningCarLight.position.set(-3.4, 1.5, -1.6);
-  scene.add(burningCarLight);
-
-  const muzzleLight = new THREE.PointLight(0xffb85c, 0, 9);
-  scene.add(muzzleLight);
-
-  // Grupo del mapa actual (para cambiar cada 5 días)
-  const mapGroup = new THREE.Group();
-  scene.add(mapGroup);
-
-  const streetFloor = new THREE.Mesh(
-    new THREE.PlaneGeometry(28, 12),
-    new THREE.MeshStandardMaterial({
-      map: makeAsphaltTexture(),
-      roughness: 0.72,
-      metalness: 0.18
-    })
-  );
-  streetFloor.rotation.x = -Math.PI / 2;
-  streetFloor.receiveShadow = true;
-  mapGroup.add(streetFloor);
-
-  // Fachadas oscuras al fondo de la calle
-  const buildingWall = new THREE.Mesh(
-    new THREE.BoxGeometry(28, 8, 0.6),
-    new THREE.MeshStandardMaterial({
-      map: makeFabricTexture('#13161b', '#1d222a', 0.25),
-      roughness: 0.92
-    })
-  );
-  buildingWall.position.set(0, 4, -4.5);
-  mapGroup.add(buildingWall);
-
-  // Carro incendiado en el carril superior-medio con núcleo incandescente
-  const carGroup = new THREE.Group();
-  carGroup.position.set(-3.4, 0, -1.55);
-  carGroup.rotation.y = 0.22;
-
-  const charredMetalMat = new THREE.MeshStandardMaterial({
-    map: makeFabricTexture('#17181b', '#2b1812', 0.35),
-    roughness: 0.85,
-    metalness: 0.35
-  });
-  const carChassis = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.62, 1.35), charredMetalMat);
-  carChassis.position.y = 0.48;
-  carChassis.castShadow = true;
-
-  const carCabin = new THREE.Mesh(new THREE.BoxGeometry(1.45, 0.55, 1.22), charredMetalMat);
-  carCabin.position.set(0.1, 1.02, 0);
-  carCabin.castShadow = true;
-
-  const emberCore = new THREE.Mesh(
-    new THREE.BoxGeometry(1.15, 0.35, 1.05),
-    new THREE.MeshBasicMaterial({ color: 0xff4d12 })
-  );
-  emberCore.position.set(-0.65, 0.82, 0);
-
-  carGroup.add(carChassis, carCabin, emberCore);
-  mapGroup.add(carGroup);
-
-  // Barricada a la derecha
-  const barricadeMeshes = [];
-  const barCoords = [
-    { x: 4.5, z: -2.2 },
-    { x: 4.9, z: -0.8 },
-    { x: 5.2, z: 0.7 },
-    { x: 5.5, z: 2.1 }
-  ];
-  const barMat = new THREE.MeshStandardMaterial({
-    map: makeFabricTexture('#5a422a', '#2c3527', 0.3),
-    roughness: 0.88
-  });
-  barCoords.forEach((c) => {
-    const m = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.88, 1.15), barMat);
-    m.position.set(c.x, 0.44, c.z);
-    m.rotation.y = -0.16;
-    m.castShadow = true;
-    m.receiveShadow = true;
-    mapGroup.add(m);
-    barricadeMeshes.push(m);
-  });
-
-  /* =========================================================
-     5. SOLDADO REMASTERIZADO (ORGÁNICO + SCAR EN ESPALDA / GLOCK)
-     ========================================================= */
-  function createRemasteredSoldier() {
-    const root = new THREE.Group();
-
-    const suitTex = makeFabricTexture('#262b33', '#363e4a', 0.28);
-    const tanTex = makeFabricTexture('#967c52', '#6e5836', 0.25);
-    const darkTex = makeFabricTexture('#121417', '#1e2228', 0.2);
-
-    const suitMat = new THREE.MeshStandardMaterial({ map: suitTex, roughness: 0.78 });
-    const tanMat = new THREE.MeshStandardMaterial({ map: tanTex, roughness: 0.68 });
-    const darkMat = new THREE.MeshStandardMaterial({ map: darkTex, roughness: 0.55 });
-
-    function makeLimb(rTop, rBot, len, mat) {
-      const g = new THREE.Group();
-      const cyl = new THREE.Mesh(new THREE.CylinderGeometry(rTop, rBot, len, 14), mat);
-      cyl.position.y = -len * 0.5;
-      cyl.castShadow = true;
-      const cap = new THREE.Mesh(new THREE.SphereGeometry(rTop, 12, 12), mat);
-      g.add(cyl, cap);
-      return g;
-    }
-
-    // Piernas orgánicas
-    const legL = makeLimb(0.125, 0.095, 0.74, suitMat);
-    legL.position.set(-0.13, 0.76, 0.08);
-    const legR = makeLimb(0.125, 0.095, 0.74, suitMat);
-    legR.position.set(0.13, 0.76, -0.08);
-
-    // Torso y chaleco porta-placas
-    const torsoGroup = new THREE.Group();
-    torsoGroup.position.set(0, 0.82, 0);
-
-    const chest = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.2, 0.58, 16), suitMat);
-    chest.position.y = 0.29;
-    chest.castShadow = true;
-
-    const vest = new THREE.Mesh(new THREE.CylinderGeometry(0.265, 0.235, 0.48, 16), tanMat);
-    vest.position.y = 0.32;
-    vest.castShadow = true;
-
-    // SCAR-L colgado en la espalda cuando se usa la Glock
-    const slungScar = new THREE.Group();
-    slungScar.position.set(0.22, 0.34, 0);
-    slungScar.rotation.z = -0.35;
-    const sBody = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.62, 0.14), tanMat);
-    const sBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.32, 8), darkMat);
-    sBarrel.position.y = -0.44;
-    slungScar.add(sBody, sBarrel);
-    slungScar.visible = false;
-
-    // Glock enfundada en muslo cuando se usa el SCAR
-    const holsteredGlock = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.16, 0.14), darkMat);
-    holsteredGlock.position.set(-0.08, -0.22, -0.18);
-
-    // Cabeza, casco FAST tan y NVG doble
-    const headPivot = new THREE.Group();
-    headPivot.position.set(0, 0.68, 0);
-
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.175, 16, 16), darkMat);
-    head.castShadow = true;
-
-    const helmet = new THREE.Mesh(
-      new THREE.SphereGeometry(0.198, 16, 16, 0, Math.PI * 2, 0, Math.PI * 0.6),
-      tanMat
-    );
-    helmet.position.y = 0.03;
-    helmet.castShadow = true;
-
-    const nvgL = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.12, 10), tanMat);
-    nvgL.rotation.z = Math.PI / 2.6;
-    nvgL.position.set(-0.24, 0.16, 0.05);
-
-    const nvgR = nvgL.clone();
-    nvgR.position.set(-0.24, 0.16, -0.05);
-
-    headPivot.add(head, helmet, nvgL, nvgR);
-
-    // Brazos y armas activas
-    const armPivot = new THREE.Group();
-    armPivot.position.set(-0.14, 0.44, 0.06);
-
-    const armL = makeLimb(0.075, 0.062, 0.42, suitMat);
-    armL.rotation.z = Math.PI / 2.2;
-    armL.position.set(-0.06, 0, 0.14);
-
-    const armR = makeLimb(0.075, 0.062, 0.42, suitMat);
-    armR.rotation.z = Math.PI / 2.2;
-    armR.position.set(-0.06, 0, -0.14);
-
-    // Modelo activo FN SCAR-L
-    const scarActive = new THREE.Group();
-    const rec = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.11, 0.08), tanMat);
-    rec.position.set(-0.34, 0.02, 0);
-    const stk = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.11, 0.07), tanMat);
-    stk.position.set(0.04, 0, 0);
-    const brl = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.34, 8), darkMat);
-    brl.rotation.z = Math.PI / 2;
-    brl.position.set(-0.76, 0.03, 0);
-    const scarTip = new THREE.Object3D();
-    scarTip.position.set(-0.94, 0.03, 0);
-    scarActive.add(rec, stk, brl, scarTip);
-
-    // Modelo activo Glock 19
-    const glockActive = new THREE.Group();
-    const slide = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.075, 0.055), darkMat);
-    slide.position.set(-0.24, 0.03, 0);
-    const grip = new THREE.Mesh(new THREE.BoxGeometry(0.065, 0.13, 0.05), darkMat);
-    grip.position.set(-0.14, -0.03, 0);
-    grip.rotation.z = 0.25;
-    const glockTip = new THREE.Object3D();
-    glockTip.position.set(-0.37, 0.035, 0);
-    glockActive.add(slide, grip, glockTip);
-    glockActive.visible = false;
-
-    armPivot.add(armL, armR, scarActive, glockActive);
-    torsoGroup.add(chest, vest, slungScar, holsteredGlock, headPivot, armPivot);
-    root.add(legL, legR, torsoGroup);
-
+  function createDefaultState() {
     return {
-      root,
-      torsoGroup,
-      armPivot,
-      scarActive,
-      glockActive,
-      slungScar,
-      holsteredGlock,
-      scarTip,
-      glockTip,
-      legL,
-      legR
+      phase: 'day', // 'day' | 'night' | 'ended'
+      day: 1,
+      hoursLeft: DAY_HOURS_TOTAL,
+      cityIndex: 0,
+      supplies: 2,
+      barricadeHp: 100,
+      maxBarricadeHp: 100,
+      allies: 0,
+      kills: 0,
+      weapons: JSON.parse(JSON.stringify(WEAPON_DEFS)),
+      activeWeaponIndex: 0,
+      magAmmo: 15,
+      reloading: false,
+      reloadTimer: 0,
+      nightTimeLeft: NIGHT_DURATION
     };
   }
 
-  const soldier = createRemasteredSoldier();
-  soldier.root.position.set(6.3, 0, 0.2);
-  scene.add(soldier.root);
+  let game = createDefaultState();
 
-  /* =========================================================
-     6. ZOMBIS REALISTAS (LENTOS Y CORREDORES EN 3 LÍNEAS)
-     ========================================================= */
-  const zShirtTexA = makeFabricTexture('#3e473a', '#232820', 0.35);
-  const zShirtTexB = makeFabricTexture('#4a3832', '#261a16', 0.35);
-  const zSkinMat = new THREE.MeshStandardMaterial({ color: 0x7a8374, roughness: 0.85 });
-  const zPantsMat = new THREE.MeshStandardMaterial({
-    map: makeFabricTexture('#23262c', '#14161a', 0.3),
-    roughness: 0.9
-  });
-
-  function createRealisticZombie(isRunner, seed) {
-    const g = new THREE.Group();
-    const shirtMat = new THREE.MeshStandardMaterial({
-      map: seed % 2 === 0 ? zShirtTexA : zShirtTexB,
-      roughness: 0.88
-    });
-
-    const legL = new THREE.Mesh(new THREE.CylinderGeometry(0.095, 0.075, 0.72, 10), zPantsMat);
-    legL.position.set(-0.11, 0.36, 0.07);
-    const legR = legL.clone();
-    legR.position.set(0.11, 0.36, -0.07);
-
-    const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.21, 0.17, 0.58, 12), shirtMat);
-    torso.position.set(0, 0.98, 0);
-    torso.rotation.z = isRunner ? -0.34 : -0.14;
-
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.165, 12, 12), zSkinMat);
-    head.position.set(isRunner ? 0.14 : 0.07, 1.42, 0);
-
-    const armL = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.048, 0.48, 8), zSkinMat);
-    armL.position.set(0.24, 1.15, 0.15);
-    armL.rotation.z = Math.PI / 2.3;
-
-    const armR = armL.clone();
-    armR.position.set(0.24, 1.15, -0.15);
-
-    g.add(legL, legR, torso, head, armL, armR);
-    return { group: g, legL, legR, armL, armR };
-  }
-
-  /* =========================================================
-     7. ESTADO DEL JUEGO (100+ ZOMBIS, 3 LÍNEAS, CADA 5 DÍAS)
-     ========================================================= */
-  const WEAPONS = {
-    scar:  { name: 'FN SCAR-L', magSize: 30, fireInterval: 0.125, reloadTime: 1.3, damage: 36, spread: 0.03 },
-    glock: { name: 'GLOCK 19',  magSize: 17, fireInterval: 0.17,  reloadTime: 0.85, damage: 25, spread: 0.015 }
-  };
-
-  const LANES_Z = [-2.2, 0.1, 2.35]; // Línea alta, media y baja
-
-  const state = {
-    mode: 'menu', // 'menu' | 'playing' | 'gameover'
-    day: 1,
-    totalHordeRemaining: 100,
-    kills: 0,
-    barricadeHp: 100,
-    morale: 85,
-    weaponKey: 'scar',
-    ammo: 30,
-    reloading: false,
-    reloadTimer: 0,
-    fireTimer: 0,
-    playerZ: 0.1,
-    aimWorld: new THREE.Vector3(-2.0, 1.05, 0.1),
-    aimScreen: { x: 0, y: 0, active: false },
-    movePointerId: null,
-    aimPointerId: null,
-    zombies: [],
-    corpses: [],
-    bloodPools: [],
-    particles: [],
-    tracers: [],
-    spawnTimer: 0.3,
-    elapsed: 0
-  };
-
-  function getMapTitleForDay(day) {
-    const cycle = Math.floor((day - 1) / 5);
-    if (cycle === 0) return `DÍAS 1–5 · CALLE EN LLAMAS`;
-    return `DÍAS ${cycle * 5 + 1}–${cycle * 5 + 5} · SECTOR ${cycle + 1}`;
-  }
-
-  function applyQualitySettings() {
-    const preset = QUALITY_PRESETS[currentQuality];
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, preset.pixelRatio));
-    renderer.shadowMap.enabled = preset.shadows;
-    fog.density = preset.fogDensity;
-    burningCarLight.intensity = preset.fireLight;
-    resizeRenderer();
-  }
-
-  function resizeRenderer() {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    renderer.setSize(w, h, false);
-    fxCanvas.width = w;
-    fxCanvas.height = h;
-    camera.aspect = w / Math.max(1, h);
-    camera.updateProjectionMatrix();
-  }
-
-  function syncWeaponVisuals() {
-    const isScar = state.weaponKey === 'scar';
-    soldier.scarActive.visible = isScar;
-    soldier.glockActive.visible = !isScar;
-    soldier.slungScar.visible = !isScar;
-    soldier.holsteredGlock.visible = isScar;
-  }
-
-  function showBanner(text) {
-    const el = document.getElementById('center-banner');
-    el.textContent = text;
-    el.style.opacity = '1';
-    clearTimeout(showBanner._t);
-    showBanner._t = setTimeout(() => { el.style.opacity = '0'; }, 1400);
-  }
-
-  function updateHud() {
-    const w = WEAPONS[state.weaponKey];
-    const barPct = Math.max(0, Math.round(state.barricadeHp));
-    const moralePct = Math.max(0, Math.min(100, Math.round(state.morale)));
-
-    document.getElementById('map-label').textContent = getMapTitleForDay(state.day);
-    document.getElementById('barricade-fill').style.width = `${barPct}%`;
-    document.getElementById('barricade-label').textContent = `BARRICADA ${barPct}%`;
-    document.getElementById('day-label').textContent = `DÍA ${state.day}`;
-    document.getElementById('morale-fill').style.width = `${moralePct}%`;
-    document.getElementById('horde-label').textContent =
-      `HORDA: ${state.totalHordeRemaining + state.zombies.length} · BAJAS: ${state.kills}`;
-    document.getElementById('weapon-name').textContent = w.name;
-    document.getElementById('ammo-count').textContent = state.reloading ? 'REC...' : `${state.ammo} / ∞`;
-  }
-
-  function startNewGame() {
-    audio.unlock();
-    audio.setAmbientActive(true);
-
-    for (const z of state.zombies) scene.remove(z.group);
-    state.zombies = [];
-    for (const c of state.corpses) scene.remove(c);
-    state.corpses = [];
-    state.bloodPools = [];
-    state.particles = [];
-    state.tracers = [];
-
-    state.day = 1;
-    state.totalHordeRemaining = 100; // Mínimo 100 zombis en la horda
-    state.kills = 0;
-    state.barricadeHp = 100;
-    state.morale = 85;
-    state.weaponKey = 'scar';
-    state.ammo = WEAPONS.scar.magSize;
-    state.reloading = false;
-    state.spawnTimer = 0.25;
-    state.mode = 'playing';
-
-    syncWeaponVisuals();
-    document.getElementById('main-menu').classList.add('hidden');
-    document.getElementById('options-panel').classList.remove('visible');
-    document.getElementById('end-overlay').classList.remove('visible');
-    document.getElementById('game-root').classList.add('gameplay-active');
-
-    showBanner('DÍA 1 · HORDA DE 100 ZOMBIS EN 3 LÍNEAS');
-    updateHud();
-  }
-
-  function advanceDay() {
-    const prevCycle = Math.floor((state.day - 1) / 5);
-    state.day++;
-    const nextCycle = Math.floor((state.day - 1) / 5);
-
-    state.totalHordeRemaining = 100 + (state.day - 1) * 15;
-    state.barricadeHp = Math.min(100, state.barricadeHp + 30);
-    state.morale = Math.min(100, state.morale + 15);
-    state.spawnTimer = 0.4;
-
-    if (nextCycle !== prevCycle) {
-      // Cambio de mapa cada 5 días
-      for (const c of state.corpses) scene.remove(c);
-      state.corpses = [];
-      state.bloodPools = [];
-      showBanner(`NUEVO MAPA · ${getMapTitleForDay(state.day)}`);
-    } else {
-      showBanner(`DÍA ${state.day} · HORDA DE ${state.totalHordeRemaining}`);
-    }
-    updateHud();
-  }
-
-  function spawnZombieFromLanes() {
-    if (state.totalHordeRemaining <= 0) return;
-    state.totalHordeRemaining--;
-
-    const laneIdx = state.totalHordeRemaining % 3; // Alta (-2.2), media (0.1), baja (2.35)
-    const zJitter = (Math.random() - 0.5) * 0.45;
-    const isRunner = Math.random() < 0.42; // Mezcla de lentos y corredores
-
-    const zObj = createRealisticZombie(isRunner, state.totalHordeRemaining);
-    zObj.group.position.set(-10.2 - Math.random() * 1.4, 0, LANES_Z[laneIdx] + zJitter);
-    scene.add(zObj.group);
-
-    state.zombies.push({
-      ...zObj,
-      isRunner,
-      laneZ: LANES_Z[laneIdx],
-      hp: isRunner ? 48 : 85,
-      speed: isRunner ? (2.45 + Math.random() * 0.65) : (0.85 + Math.random() * 0.35),
-      phase: Math.random() * Math.PI * 2,
-      atkTimer: 0
-    });
-  }
-
-  function startReload() {
-    const w = WEAPONS[state.weaponKey];
-    if (state.reloading || state.ammo === w.magSize || state.mode !== 'playing') return;
-    state.reloading = true;
-    state.reloadTimer = w.reloadTime;
-    audio.playReload(state.weaponKey === 'scar');
-    updateHud();
-  }
-
-  function switchWeapon() {
-    if (state.mode !== 'playing') return;
-    state.weaponKey = state.weaponKey === 'scar' ? 'glock' : 'scar';
-    state.reloading = false;
-    state.ammo = WEAPONS[state.weaponKey].magSize;
-    syncWeaponVisuals();
-    audio.playReload(state.weaponKey === 'scar');
-    updateHud();
-  }
-
-  function fireWeapon() {
-    if (state.mode !== 'playing' || state.reloading) return;
-    const w = WEAPONS[state.weaponKey];
-    if (state.ammo <= 0) {
-      startReload();
-      return;
-    }
-
-    state.fireTimer = w.fireInterval;
-    state.ammo--;
-    updateHud();
-
-    if (state.weaponKey === 'scar') {
-      audio.playScarShot();
-    } else {
-      audio.playGlockShot();
-    }
-
-    muzzleLight.intensity = 4.2;
-    soldier.armPivot.position.x = -0.07;
-
-    const tip = state.weaponKey === 'scar' ? soldier.scarTip : soldier.glockTip;
-    const origin = new THREE.Vector3();
-    tip.getWorldPosition(origin);
-    muzzleLight.position.copy(origin);
-
-    const target = state.aimWorld.clone();
-    target.x += (Math.random() - 0.5) * w.spread * 14;
-    target.z += (Math.random() - 0.5) * w.spread * 14;
-
-    const dir = target.clone().sub(origin).normalize();
-    const ray = new THREE.Ray(origin, dir);
-
-    let hitPoint = origin.clone().addScaledVector(dir, 15);
-    let hitZombie = null;
-    let isHead = false;
-    let bestDist = Infinity;
-
-    for (const z of state.zombies) {
-      const center = z.group.position.clone().add(new THREE.Vector3(0, 1.0, 0));
-      if (ray.distanceSqToPoint(center) < 0.46) {
-        const d = origin.distanceTo(center);
-        if (d < bestDist) {
-          bestDist = d;
-          hitZombie = z;
-          hitPoint = center;
-          const headCenter = z.group.position.clone().add(new THREE.Vector3(0.08, 1.42, 0));
-          isHead = ray.distanceSqToPoint(headCenter) < 0.15;
-        }
-      }
-    }
-
-    state.tracers.push({ from: origin.clone(), to: hitPoint.clone(), life: 0.055 });
-
-    if (hitZombie) {
-      hitZombie.hp -= w.damage * (isHead ? 1.85 : 1.0);
-      audio.playHit(isHead);
-
-      const maxP = QUALITY_PRESETS[currentQuality].maxParticles;
-      for (let i = 0; i < 6 && state.particles.length < maxP; i++) {
-        state.particles.push({
-          pos: hitPoint.clone(),
-          vel: new THREE.Vector3((Math.random() - 0.5) * 4.5, 1.5 + Math.random() * 2.5, (Math.random() - 0.5) * 4.5),
-          life: 0.35,
-          color: '#c92626'
-        });
-      }
-
-      if (hitZombie.hp <= 0) {
-        state.kills++;
-        state.morale = Math.min(100, state.morale + (isHead ? 4 : 2));
-        state.bloodPools.push({
-          x: hitZombie.group.position.x,
-          z: hitZombie.group.position.z,
-          r: 0.45 + Math.random() * 0.3
-        });
-
-        const corpse = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.09, 0.09, 0.95, 8),
-          zPantsMat
-        );
-        corpse.rotation.z = Math.PI / 2;
-        corpse.rotation.y = Math.random() * Math.PI;
-        corpse.position.set(hitZombie.group.position.x, 0.09, hitZombie.group.position.z);
-        scene.add(corpse);
-        state.corpses.push(corpse);
-        if (state.corpses.length > 35) {
-          scene.remove(state.corpses.shift());
-        }
-
-        scene.remove(hitZombie.group);
-        state.zombies = state.zombies.filter((item) => item !== hitZombie);
-        updateHud();
-      }
-    }
-
-    if (state.ammo === 0) startReload();
-  }
-
-  /* =========================================================
-     8. CONTROLES TÁCTILES, FULL SCREEN Y MENÚ
-     ========================================================= */
-  const raycaster = new THREE.Raycaster();
-  const aimPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -1.0);
-
-  function updateAim(x, y) {
-    state.aimScreen.x = x;
-    state.aimScreen.y = y;
-    state.aimScreen.active = true;
-    const rect = threeCanvas.getBoundingClientRect();
-    const ndc = new THREE.Vector2(
-      ((x - rect.left) / rect.width) * 2 - 1,
-      -((y - rect.top) / rect.height) * 2 + 1
-    );
-    raycaster.setFromCamera(ndc, camera);
-    const pt = new THREE.Vector3();
-    if (raycaster.ray.intersectPlane(aimPlane, pt)) {
-      pt.x = Math.max(-9.8, Math.min(4.8, pt.x));
-      pt.z = Math.max(-3.0, Math.min(3.0, pt.z));
-      state.aimWorld.copy(pt);
-    }
-  }
-
-  function updateMoveY(clientY) {
-    const rail = document.getElementById('move-rail').getBoundingClientRect();
-    const ratio = Math.max(0, Math.min(1, (clientY - rail.top) / rail.height));
-    state.playerZ = -2.5 + ratio * 5.0;
-    document.getElementById('move-thumb').style.transform = `translateY(${(ratio - 0.5) * 116}px)`;
-  }
-
-  threeCanvas.addEventListener('pointerdown', (e) => {
-    audio.unlock();
-    if (state.mode !== 'playing') return;
-    if (e.clientX < window.innerWidth * 0.22 && state.movePointerId === null) {
-      state.movePointerId = e.pointerId;
-      updateMoveY(e.clientY);
-    } else if (state.aimPointerId === null) {
-      state.aimPointerId = e.pointerId;
-      updateAim(e.clientX, e.clientY);
-    } else {
-      updateAim(e.clientX, e.clientY);
-    }
-  });
-
-  window.addEventListener('pointermove', (e) => {
-    if (e.pointerId === state.movePointerId) updateMoveY(e.clientY);
-    if (e.pointerId === state.aimPointerId) updateAim(e.clientX, e.clientY);
-  });
-
-  window.addEventListener('pointerup', (e) => {
-    if (e.pointerId === state.movePointerId) state.movePointerId = null;
-    if (e.pointerId === state.aimPointerId) state.aimPointerId = null;
-  });
-
-  window.addEventListener('pointercancel', (e) => {
-    if (e.pointerId === state.movePointerId) state.movePointerId = null;
-    if (e.pointerId === state.aimPointerId) state.aimPointerId = null;
-  });
-
-  async function toggleFullScreen() {
+  function loadGame() {
     try {
-      if (!document.fullscreenElement) {
-        await document.documentElement.requestFullscreen();
-      } else {
-        await document.exitFullscreen();
+      const raw = localStorage.getItem(SAVE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed.day === 'number') {
+        game = Object.assign(createDefaultState(), parsed);
+        if (!Array.isArray(game.weapons) || game.weapons.length !== 4) {
+          game.weapons = JSON.parse(JSON.stringify(WEAPON_DEFS));
+        }
+        const curW = game.weapons[game.activeWeaponIndex] || game.weapons[0];
+        game.magAmmo = Math.min(curW.mag, game.magAmmo || curW.mag);
       }
     } catch (_) {}
   }
 
-  document.getElementById('btn-new').addEventListener('click', startNewGame);
-  document.getElementById('retry-btn').addEventListener('click', startNewGame);
-  document.getElementById('btn-options').addEventListener('click', () => {
-    audio.unlock();
-    syncQualityButtons();
-    document.getElementById('options-panel').classList.add('visible');
-  });
-  document.getElementById('btn-options-back').addEventListener('click', () => {
-    document.getElementById('options-panel').classList.remove('visible');
-  });
-  document.querySelectorAll('.q-btn').forEach((btn) => {
-    btn.addEventListener('click', () => saveQuality(btn.dataset.q));
-  });
-  document.getElementById('btn-fullscreen').addEventListener('click', toggleFullScreen);
-  document.getElementById('btn-fs-hud').addEventListener('pointerdown', (e) => {
-    e.stopPropagation();
-    toggleFullScreen();
-  });
-  document.getElementById('btn-exit').addEventListener('click', () => {
-    audio.setAmbientActive(false);
-    try { window.close(); } catch (_) {}
-    showBanner('SESIÓN CERRADA · PUEDES CERRAR LA PESTAÑA');
-  });
-  document.getElementById('btn-menu-hud').addEventListener('pointerdown', (e) => {
-    e.stopPropagation();
-    state.mode = 'menu';
-    audio.setAmbientActive(false);
-    document.getElementById('game-root').classList.remove('gameplay-active');
-    document.getElementById('main-menu').classList.remove('hidden');
-  });
-  document.getElementById('btn-reload').addEventListener('pointerdown', (e) => {
-    e.stopPropagation();
-    startReload();
-  });
-  document.getElementById('btn-weapon').addEventListener('pointerdown', (e) => {
-    e.stopPropagation();
-    switchWeapon();
-  });
-  document.getElementById('end-to-menu').addEventListener('click', () => {
-    state.mode = 'menu';
-    document.getElementById('end-overlay').classList.remove('visible');
-    document.getElementById('game-root').classList.remove('gameplay-active');
-    document.getElementById('main-menu').classList.remove('hidden');
-  });
+  function saveGame() {
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify({
+        phase: game.phase === 'night' ? 'day' : game.phase,
+        day: game.day,
+        hoursLeft: DAY_HOURS_TOTAL,
+        cityIndex: game.cityIndex,
+        supplies: game.supplies,
+        barricadeHp: game.barricadeHp,
+        maxBarricadeHp: game.maxBarricadeHp,
+        allies: game.allies,
+        kills: game.kills,
+        weapons: game.weapons,
+        activeWeaponIndex: game.activeWeaponIndex,
+        magAmmo: game.weapons[game.activeWeaponIndex].mag
+      }));
+    } catch (_) {}
+  }
 
-  function worldToScreen(v) {
-    const p = v.clone().project(camera);
+  /* =========================================================
+     ENTIDADES DE COMBATE NOCTURNO (CANVAS 2D)
+     ========================================================= */
+  const canvas = document.getElementById('game-canvas');
+  const ctx = canvas.getContext('2d');
+  const sfx = new SoundFX();
+
+  const combat = {
+    playerY: 0.56,
+    aimX: 0.65,
+    aimY: 0.56,
+    pointerDown: false,
+    fireCooldown: 0,
+    allyCooldowns: [],
+    zombies: [],
+    bullets: [],
+    particles: [],
+    popups: [],
+    corpses: [],
+    spawnTimer: 0.7,
+    muzzleFlash: 0
+  };
+
+  function getWeaponStats(w) {
+    const mult = 1 + (w.level - 1) * 0.22;
     return {
-      x: (p.x * 0.5 + 0.5) * fxCanvas.width,
-      y: (-p.y * 0.5 + 0.5) * fxCanvas.height
+      damage: Math.round(w.damage * mult),
+      mag: w.mag + (w.level - 1) * 2,
+      reloadTime: Math.max(0.45, w.reloadTime - (w.level - 1) * 0.08),
+      fireDelay: w.fireDelay,
+      pellets: w.pellets || 1,
+      spread: w.spread || 0.02,
+      pierce: w.pierce || 1
     };
   }
 
-  window.addEventListener('resize', resizeRenderer);
-  syncQualityButtons();
-  applyQualitySettings();
-  syncWeaponVisuals();
+  function getCurrentWeapon() {
+    return game.weapons[game.activeWeaponIndex] || game.weapons[0];
+  }
 
-  let lastTime = performance.now();
+  function selectWeapon(idx) {
+    const w = game.weapons[idx];
+    if (!w || !w.unlocked) return;
+    game.activeWeaponIndex = idx;
+    const stats = getWeaponStats(w);
+    game.magAmmo = Math.min(stats.mag, game.magAmmo || stats.mag);
+    game.reloading = false;
+    game.reloadTimer = 0;
+    refreshHud();
+  }
 
-  function loop(now) {
-    requestAnimationFrame(loop);
-    const dt = Math.min(0.05, (now - lastTime) / 1000);
-    lastTime = now;
-    state.elapsed += dt;
+  function triggerReload() {
+    if (game.phase !== 'night' || game.reloading) return;
+    const stats = getWeaponStats(getCurrentWeapon());
+    if (game.magAmmo >= stats.mag) return;
+    game.reloading = true;
+    game.reloadTimer = stats.reloadTime;
+    refreshHud();
+  }
 
-    // Parpadeo orgánico del fuego del carro incendiado
-    const flicker = 0.72 + Math.sin(state.elapsed * 19) * 0.18 + Math.random() * 0.15;
-    burningCarLight.intensity = QUALITY_PRESETS[currentQuality].fireLight * flicker;
-    emberCore.material.color.setHex(Math.random() > 0.35 ? 0xff4d12 : 0xff8c24);
-
-    // Humo / chispas del carro incendiado
-    const maxP = QUALITY_PRESETS[currentQuality].maxParticles;
-    if (state.particles.length < maxP && Math.random() < 0.55) {
-      state.particles.push({
-        pos: new THREE.Vector3(-3.6 + (Math.random() - 0.5) * 0.7, 1.1, -1.55 + (Math.random() - 0.5) * 0.5),
-        vel: new THREE.Vector3((Math.random() - 0.5) * 0.6, 1.4 + Math.random() * 1.4, (Math.random() - 0.5) * 0.6),
-        life: 0.75,
-        color: Math.random() > 0.4 ? 'rgba(90, 96, 106, 0.45)' : 'rgba(255, 110, 35, 0.75)'
-      });
+  function checkBombardmentLoss() {
+    if (game.day > MAX_DAYS && game.cityIndex < CITIES.length - 1) {
+      endGame(
+        false,
+        `Superaste el Día 40 antes de alcanzar Puerto Seguro. El bombardeo militar arrasó la zona.`
+      );
+      return true;
     }
+    return false;
+  }
 
-    if (state.mode === 'playing') {
-      audio.playZombieGroan(state.elapsed);
+  function endGame(victory, message) {
+    game.phase = 'ended';
+    combat.pointerDown = false;
+    document.getElementById('day-panel').classList.remove('visible');
+    document.getElementById('hud-top').classList.remove('active');
+    document.getElementById('hud-bottom').classList.remove('active');
 
-      soldier.root.position.z += (state.playerZ - soldier.root.position.z) * Math.min(1, dt * 14);
-      const dx = state.aimWorld.x - soldier.root.position.x;
-      const dz = state.aimWorld.z - soldier.root.position.z;
-      const yaw = Math.atan2(-dz, -dx);
-      soldier.torsoGroup.rotation.y = yaw * 0.5;
-      soldier.armPivot.rotation.y = yaw * 0.45;
+    const heading = document.getElementById('end-heading');
+    heading.textContent = victory ? '¡LLEGASTE A PUERTO SEGURO!' : 'DERROTA · BOMBARDEO / CAÍDA';
+    heading.style.color = victory ? '#48c774' : '#e85a4f';
+    document.getElementById('end-detail').innerHTML =
+      `${message}<br><br>Día alcanzado: <b>${game.day}</b> · Bajas totales: <b>${game.kills}</b> · Aliados: <b>${game.allies}</b>`;
+    document.getElementById('modal-end').classList.add('visible');
+    saveGame();
+  }
 
-      soldier.armPivot.position.x += (-0.14 - soldier.armPivot.position.x) * Math.min(1, dt * 18);
-      muzzleLight.intensity = Math.max(0, muzzleLight.intensity - dt * 45);
+  /* =========================================================
+     INTERFAZ DE FASE DE DÍA Y HUD NOCTURNO
+     ========================================================= */
+  function refreshDayPanel() {
+    const city = CITIES[game.cityIndex];
+    const nextCity = CITIES[game.cityIndex + 1];
+    const daysLeft = Math.max(0, MAX_DAYS - game.day);
 
-      // Animación de recarga
-      if (state.reloading) {
-        state.reloadTimer -= dt;
-        soldier.armPivot.rotation.z = Math.sin(state.elapsed * 22) * 0.25;
-        if (state.reloadTimer <= 0) {
-          state.reloading = false;
-          soldier.armPivot.rotation.z = 0;
-          state.ammo = WEAPONS[state.weaponKey].magSize;
-          updateHud();
-        }
-      } else {
-        soldier.armPivot.rotation.z = 0;
-      }
+    document.getElementById('day-panel-title').textContent =
+      `DÍA ${game.day} · ${city.name.toUpperCase()}`;
+    document.getElementById('pill-hours').textContent = `Horas: ${game.hoursLeft} / ${DAY_HOURS_TOTAL}`;
+    document.getElementById('pill-days-left').textContent = `Días restantes: ${daysLeft}`;
+    document.getElementById('pill-supplies').textContent = `Suministros: ${game.supplies}`;
+    document.getElementById('pill-hp').textContent =
+      `Barricada: ${Math.round((game.barricadeHp / game.maxBarricadeHp) * 100)}%`;
+    document.getElementById('pill-allies').textContent = `Sobrevivientes: ${game.allies}`;
 
-      state.fireTimer = Math.max(0, state.fireTimer - dt);
-      if (state.aimPointerId !== null && state.fireTimer <= 0) {
-        fireWeapon();
-      }
+    const strip = document.getElementById('route-strip');
+    strip.innerHTML = '';
+    CITIES.forEach((c, i) => {
+      const div = document.createElement('div');
+      div.className = 'city-node' +
+        (i < game.cityIndex ? ' done' : i === game.cityIndex ? ' current' : '');
+      div.textContent = `${i + 1}. ${c.name.split(': ')[1] || c.name}`;
+      strip.appendChild(div);
+    });
 
-      if (state.totalHordeRemaining > 0) {
-        state.spawnTimer -= dt;
-        if (state.spawnTimer <= 0) {
-          spawnZombieFromLanes();
-          state.spawnTimer = Math.max(0.22, 0.68 - state.day * 0.03);
-        }
-      } else if (state.zombies.length === 0) {
-        advanceDay();
-      }
+    document.getElementById('act-repair').disabled =
+      game.hoursLeft < 2 || game.barricadeHp >= game.maxBarricadeHp;
+    document.getElementById('act-weapons').disabled = game.hoursLeft < 3;
+    document.getElementById('act-supplies').disabled = game.hoursLeft < 2;
+    document.getElementById('act-allies').disabled = game.hoursLeft < 3 || game.allies >= 4;
 
-      for (const z of state.zombies) {
-        z.phase += dt * (z.isRunner ? 12 : 6.2);
-        const barX = 4.35;
-        if (z.group.position.x < barX) {
-          z.group.position.x += z.speed * dt;
-          z.group.position.z += (z.laneZ - z.group.position.z) * dt * 1.4;
-          z.legL.rotation.z = Math.sin(z.phase) * 0.5;
-          z.legR.rotation.z = -Math.sin(z.phase) * 0.5;
-        } else {
-          z.atkTimer -= dt;
-          z.armL.rotation.z = 0.6 + Math.sin(z.phase * 1.3) * 0.4;
-          if (z.atkTimer <= 0) {
-            z.atkTimer = 1.0;
-            state.barricadeHp = Math.max(0, state.barricadeHp - (z.isRunner ? 4.5 : 3.2));
-            state.morale = Math.max(0, state.morale - 2.2);
-            updateHud();
-            if (state.barricadeHp <= 0) {
-              state.mode = 'gameover';
-              document.getElementById('end-stats').innerHTML =
-                `Sobreviviste hasta <b>DÍA ${state.day}</b> · Bajas: <b>${state.kills}</b>`;
-              document.getElementById('end-overlay').classList.add('visible');
-              break;
-            }
-          }
-        }
-      }
-
-      const dmgRatio = 1 - state.barricadeHp / 100;
-      barricadeMeshes.forEach((m, i) => {
-        m.position.y = 0.44 - dmgRatio * 0.12;
-        m.rotation.z = (i % 2 === 0 ? 1 : -1) * dmgRatio * 0.1;
-      });
+    const btnTravel = document.getElementById('btn-travel');
+    if (nextCity) {
+      btnTravel.disabled = game.supplies < city.reqSupplies;
+      btnTravel.textContent =
+        `VIAJAR A ${nextCity.name.split(': ')[1].toUpperCase()} (${city.reqSupplies} SUM. · ${city.travelDays} DÍAS)`;
     } else {
-      // Vista atmosférica en menú
-      soldier.torsoGroup.rotation.y = Math.sin(state.elapsed * 0.6) * 0.14;
-    }
-
-    renderer.render(scene, camera);
-
-    // Efectos 2D (charcos, trazadoras, humo/sangre, mira cruz)
-    fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
-
-    for (const pool of state.bloodPools) {
-      const sp = worldToScreen(new THREE.Vector3(pool.x, 0.02, pool.z));
-      fxCtx.fillStyle = 'rgba(130, 12, 16, 0.65)';
-      fxCtx.beginPath();
-      fxCtx.ellipse(sp.x, sp.y, pool.r * 32, pool.r * 16, 0, 0, Math.PI * 2);
-      fxCtx.fill();
-    }
-
-    for (let i = state.tracers.length - 1; i >= 0; i--) {
-      const tr = state.tracers[i];
-      tr.life -= dt;
-      if (tr.life <= 0) { state.tracers.splice(i, 1); continue; }
-      const a = worldToScreen(tr.from);
-      const b = worldToScreen(tr.to);
-      fxCtx.strokeStyle = 'rgba(255, 214, 125, 0.85)';
-      fxCtx.lineWidth = 2;
-      fxCtx.beginPath(); fxCtx.moveTo(a.x, a.y); fxCtx.lineTo(b.x, b.y); fxCtx.stroke();
-    }
-
-    for (let i = state.particles.length - 1; i >= 0; i--) {
-      const p = state.particles[i];
-      p.life -= dt;
-      p.pos.addScaledVector(p.vel, dt);
-      if (p.life <= 0) { state.particles.splice(i, 1); continue; }
-      const sp = worldToScreen(p.pos);
-      fxCtx.fillStyle = p.color;
-      fxCtx.beginPath();
-      fxCtx.arc(sp.x, sp.y, 3.2, 0, Math.PI * 2);
-      fxCtx.fill();
-    }
-
-    if (state.mode === 'playing' && state.aimScreen.active) {
-      const cx = state.aimScreen.x;
-      const cy = state.aimScreen.y;
-      const g = 6;
-      const l = 8;
-      fxCtx.strokeStyle = 'rgba(248, 250, 252, 0.92)';
-      fxCtx.lineWidth = 1.8;
-      fxCtx.beginPath();
-      fxCtx.moveTo(cx - g - l, cy); fxCtx.lineTo(cx - g, cy);
-      fxCtx.moveTo(cx + g, cy); fxCtx.lineTo(cx + g + l, cy);
-      fxCtx.moveTo(cx, cy - g - l); fxCtx.lineTo(cx, cy - g);
-      fxCtx.moveTo(cx, cy + g); fxCtx.lineTo(cx, cy + g + l);
-      fxCtx.stroke();
+      btnTravel.disabled = true;
+      btnTravel.textContent = 'PUERTO SEGURO ALCANZADO';
     }
   }
 
-  requestAnimationFrame(loop);
+  function refreshHud() {
+    const city = CITIES[game.cityIndex];
+    const w = getCurrentWeapon();
+    const stats = getWeaponStats(w);
+    const hpPct = Math.max(0, Math.round((game.barricadeHp / game.maxBarricadeHp) * 100));
+
+    document.getElementById('hud-city').textContent = city.name.toUpperCase();
+    document.getElementById('hud-bar-text').textContent =
+      `Barricada: ${Math.ceil(game.barricadeHp)} / ${game.maxBarricadeHp}`;
+    const fill = document.getElementById('bar-hp-fill');
+    fill.style.width = `${hpPct}%`;
+    fill.style.backgroundColor = hpPct > 50 ? '#48c774' : hpPct > 25 ? '#f4c26b' : '#e85a4f';
+
+    document.getElementById('hud-timer').textContent =
+      `AMANECER: ${Math.max(0, Math.ceil(combat.nightTimeLeft))}s`;
+    document.getElementById('hud-day-countdown').textContent =
+      `Día ${game.day} / ${MAX_DAYS} · Aliados: ${game.allies}`;
+    document.getElementById('hud-supplies').textContent = `SUMINISTROS: ${game.supplies}`;
+    document.getElementById('hud-kills').textContent = `Bajas: ${game.kills}`;
+
+    document.getElementById('weapon-label').textContent = `${w.label.toUpperCase()} (Nv.${w.level})`;
+    document.getElementById('ammo-display').textContent =
+      game.reloading ? 'RECARGANDO...' : `${game.magAmmo} / ${stats.mag}`;
+
+    const bar = document.getElementById('weapon-bar');
+    bar.innerHTML = '';
+    game.weapons.forEach((wp, idx) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'w-btn' +
+        (idx === game.activeWeaponIndex ? ' active' : '') +
+        (!wp.unlocked ? ' locked' : '');
+      b.textContent = wp.unlocked ? `${wp.label} (${wp.level})` : `${wp.label} [Bloq]`;
+      b.disabled = !wp.unlocked;
+      b.addEventListener('pointerdown', (ev) => {
+        ev.stopPropagation();
+        selectWeapon(idx);
+      });
+      bar.appendChild(b);
+    });
+  }
+
+  function enterDayPhase() {
+    if (checkBombardmentLoss()) return;
+    game.phase = 'day';
+    game.hoursLeft = DAY_HOURS_TOTAL;
+    document.getElementById('hud-top').classList.remove('active');
+    document.getElementById('hud-bottom').classList.remove('active');
+    document.getElementById('day-panel').classList.add('visible');
+    refreshDayPanel();
+    saveGame();
+  }
+
+  function startNightPhase() {
+    if (checkBombardmentLoss()) return;
+    sfx.ensure();
+    game.phase = 'night';
+    combat.nightTimeLeft = NIGHT_DURATION;
+    combat.zombies = [];
+    combat.bullets = [];
+    combat.particles = [];
+    combat.popups = [];
+    combat.corpses = [];
+    combat.spawnTimer = 0.5;
+    combat.allyCooldowns = new Array(game.allies).fill(0.4);
+
+    const stats = getWeaponStats(getCurrentWeapon());
+    game.magAmmo = stats.mag;
+    game.reloading = false;
+
+    document.getElementById('day-panel').classList.remove('visible');
+    document.getElementById('hud-top').classList.add('active');
+    document.getElementById('hud-bottom').classList.add('active');
+    refreshHud();
+  }
+
+  /* =========================================================
+     ACCIONES DE DÍA Y VIAJE ENTRE CIUDADES
+     ========================================================= */
+  document.getElementById('act-repair').addEventListener('click', () => {
+    if (game.hoursLeft < 2) return;
+    game.hoursLeft -= 2;
+    game.barricadeHp = Math.min(game.maxBarricadeHp, game.barricadeHp + 28);
+    refreshDayPanel();
+  });
+
+  document.getElementById('act-weapons').addEventListener('click', () => {
+    if (game.hoursLeft < 3) return;
+    game.hoursLeft -= 3;
+    const lockedIdx = game.weapons.findIndex((w) => !w.unlocked);
+    if (lockedIdx !== -1) {
+      game.weapons[lockedIdx].unlocked = true;
+      game.activeWeaponIndex = lockedIdx;
+      game.magAmmo = getWeaponStats(game.weapons[lockedIdx]).mag;
+    } else {
+      const cur = getCurrentWeapon();
+      cur.level++;
+      game.magAmmo = getWeaponStats(cur).mag;
+    }
+    refreshDayPanel();
+  });
+
+  document.getElementById('act-supplies').addEventListener('click', () => {
+    if (game.hoursLeft < 2) return;
+    game.hoursLeft -= 2;
+    game.supplies += 3;
+    refreshDayPanel();
+  });
+
+  document.getElementById('act-allies').addEventListener('click', () => {
+    if (game.hoursLeft < 3 || game.allies >= 4) return;
+    game.hoursLeft -= 3;
+    game.allies++;
+    refreshDayPanel();
+  });
+
+  document.getElementById('btn-travel').addEventListener('click', () => {
+    const city = CITIES[game.cityIndex];
+    const nextCity = CITIES[game.cityIndex + 1];
+    if (!nextCity || game.supplies < city.reqSupplies) return;
+
+    game.supplies -= city.reqSupplies;
+    game.day += city.travelDays;
+    game.cityIndex++;
+    game.hoursLeft = DAY_HOURS_TOTAL;
+
+    if (game.cityIndex === CITIES.length - 1 && game.day <= MAX_DAYS) {
+      endGame(true, `Alcanzaste Puerto Seguro en el Día ${game.day} de 40 con tu barricada operativa.`);
+      return;
+    }
+    if (checkBombardmentLoss()) return;
+
+    saveGame();
+    refreshDayPanel();
+  });
+
+  document.getElementById('btn-start-night').addEventListener('click', startNightPhase);
+
+  document.getElementById('btn-reset-save').addEventListener('click', () => {
+    localStorage.removeItem(SAVE_KEY);
+    game = createDefaultState();
+    document.getElementById('modal-end').classList.remove('visible');
+    enterDayPhase();
+  });
+
+  document.getElementById('btn-restart-end').addEventListener('click', () => {
+    localStorage.removeItem(SAVE_KEY);
+    game = createDefaultState();
+    document.getElementById('modal-end').classList.remove('visible');
+    enterDayPhase();
+  });
+
+  document.getElementById('btn-reload').addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    triggerReload();
+  });
+
+  document.getElementById('btn-sound').addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    sfx.ensure();
+    const on = sfx.toggle();
+    document.getElementById('btn-sound').textContent = on ? 'SFX ON' : 'SFX OFF';
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (game.phase !== 'night') return;
+    if (e.key === 'r' || e.key === 'R') triggerReload();
+    if (['1', '2', '3', '4'].includes(e.key)) {
+      selectWeapon(Number(e.key) - 1);
+    }
+  });
+
+  /* =========================================================
+     CONTROLES DE APUNTADO / DISPARO (RATÓN Y TÁCTIL)
+     ========================================================= */
+  function updateAimFromClient(clientX, clientY) {
+    const rect = canvas.getBoundingClientRect();
+    combat.aimX = Math.max(0.16, Math.min(0.98, (clientX - rect.left) / rect.width));
+    combat.aimY = Math.max(0.24, Math.min(0.88, (clientY - rect.top) / rect.height));
+    combat.playerY = combat.aimY;
+  }
+
+  canvas.addEventListener('pointerdown', (e) => {
+    if (game.phase !== 'night') return;
+    sfx.ensure();
+    combat.pointerDown = true;
+    updateAimFromClient(e.clientX, e.clientY);
+  });
+
+  window.addEventListener('pointermove', (e) => {
+    if (game.phase !== 'night') return;
+    if (combat.pointerDown) updateAimFromClient(e.clientX, e.clientY);
+  });
+
+  window.addEventListener('pointerup', () => { combat.pointerDown = false; });
+  window.addEventListener('pointercancel', () => { combat.pointerDown = false; });
+
+  /* =========================================================
+     COMBATE NOCTURNO: 4 TIPOS DE ZOMBIS + ALIADOS IA
+     ========================================================= */
+  function spawnZombie(w, h) {
+    const roll = Math.random();
+    let type = 'walker';
+    if (roll > 0.78) type = 'melee';
+    else if (roll > 0.54) type = 'armored';
+    else if (roll > 0.28) type = 'runner';
+
+    const dayScale = 1 + (game.day - 1) * 0.1;
+    const yNorm = 0.28 + Math.random() * 0.56;
+
+    const specs = {
+      walker:  { hp: 55 * dayScale, speed: 46 + Math.random() * 14, dmg: 6,  color: '#6d7b64', radius: 16 },
+      runner:  { hp: 32 * dayScale, speed: 112 + Math.random() * 25, dmg: 5, color: '#9c4a42', radius: 15 },
+      armored: { hp: 145 * dayScale, speed: 30 + Math.random() * 8, dmg: 8,  color: '#46586e', radius: 18 },
+      melee:   { hp: 68 * dayScale, speed: 56 + Math.random() * 15, dmg: 14, color: '#a67c37', radius: 16 }
+    }[type];
+
+    combat.zombies.push({
+      type,
+      x: w + 24,
+      y: yNorm * h,
+      yNorm,
+      hp: specs.hp,
+      maxHp: specs.hp,
+      speed: specs.speed,
+      dmg: specs.dmg,
+      color: specs.color,
+      radius: specs.radius,
+      atkTimer: 0.4,
+      walkPhase: Math.random() * Math.PI * 2
+    });
+  }
+
+  function spawnBullet(x, y, angle, damage, pierce, color = '#ffe082', fromAlly = false) {
+    combat.bullets.push({
+      x,
+      y,
+      vx: Math.cos(angle) * 980,
+      vy: Math.sin(angle) * 980,
+      damage,
+      pierceLeft: pierce,
+      hitIds: new Set(),
+      color,
+      fromAlly,
+      life: 1.1
+    });
+  }
+
+  function firePlayerShot(w, h) {
+    const weapon = getCurrentWeapon();
+    const stats = getWeaponStats(weapon);
+    if (game.magAmmo <= 0) {
+      triggerReload();
+      return;
+    }
+
+    game.magAmmo--;
+    combat.fireCooldown = stats.fireDelay;
+    combat.muzzleFlash = 0.06;
+    sfx.shot(weapon.key);
+
+    const originX = w * 0.11;
+    const originY = combat.playerY * h - 6;
+    const targetX = combat.aimX * w;
+    const targetY = combat.aimY * h;
+    const baseAngle = Math.atan2(targetY - originY, targetX - originX);
+
+    for (let i = 0; i < stats.pellets; i++) {
+      const offset = (Math.random() - 0.5) * stats.spread * 2;
+      spawnBullet(originX, originY, baseAngle + offset, stats.damage, stats.pierce);
+    }
+
+    if (game.magAmmo <= 0) {
+      triggerReload();
+    }
+    refreshHud();
+  }
+
+  function addPopup(x, y, text, color, scale = 1) {
+    combat.popups.push({ x, y, vy: -38, text, color, scale, life: 0.65 });
+  }
+
+  function addParticles(x, y, color, count) {
+    for (let i = 0; i < count; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const spd = 40 + Math.random() * 150;
+      combat.particles.push({
+        x,
+        y,
+        vx: Math.cos(ang) * spd,
+        vy: Math.sin(ang) * spd,
+        color,
+        life: 0.28 + Math.random() * 0.2
+      });
+    }
+  }
+
+  function updateCombat(dt, w, h) {
+    combat.nightTimeLeft -= dt;
+    combat.muzzleFlash = Math.max(0, combat.muzzleFlash - dt);
+
+    if (game.reloading) {
+      game.reloadTimer -= dt;
+      if (game.reloadTimer <= 0) {
+        game.reloading = false;
+        game.magAmmo = getWeaponStats(getCurrentWeapon()).mag;
+        refreshHud();
+      }
+    }
+
+    combat.fireCooldown = Math.max(0, combat.fireCooldown - dt);
+    if (combat.pointerDown && !game.reloading && combat.fireCooldown <= 0) {
+      firePlayerShot(w, h);
+    }
+
+    // Aliados IA disparan automáticamente al zombi más cercano
+    for (let i = 0; i < game.allies; i++) {
+      combat.allyCooldowns[i] = (combat.allyCooldowns[i] || 0) - dt;
+      if (combat.allyCooldowns[i] <= 0 && combat.zombies.length > 0) {
+        combat.allyCooldowns[i] = 0.78;
+        const allyY = h * (0.34 + i * 0.14);
+        const allyX = w * 0.085;
+        let nearest = combat.zombies[0];
+        let bestDist = Infinity;
+        for (const z of combat.zombies) {
+          const d = Math.hypot(z.x - allyX, z.y - allyY);
+          if (d < bestDist) { bestDist = d; nearest = z; }
+        }
+        const ang = Math.atan2(nearest.y - allyY, nearest.x - allyX);
+        spawnBullet(allyX, allyY, ang, 14, 1, '#9be7ff', true);
+      }
+    }
+
+    // Generación de oleadas
+    combat.spawnTimer -= dt;
+    if (combat.spawnTimer <= 0) {
+      spawnZombie(w, h);
+      const baseInterval = Math.max(0.35, 1.15 - game.day * 0.04);
+      combat.spawnTimer = baseInterval * (0.75 + Math.random() * 0.5);
+    }
+
+    const barricadeX = w * 0.13;
+
+    // Balas y detección de impacto / cabeza (crítico x2.5)
+    for (let i = combat.bullets.length - 1; i >= 0; i--) {
+      const b = combat.bullets[i];
+      b.life -= dt;
+      b.x += b.vx * dt;
+      b.y += b.vy * dt;
+
+      if (b.life <= 0 || b.x < 0 || b.x > w + 40) {
+        combat.bullets.splice(i, 1);
+        continue;
+      }
+
+      for (let j = combat.zombies.length - 1; j >= 0; j--) {
+        const z = combat.zombies[j];
+        if (b.hitIds.has(z)) continue;
+
+        const bodyTop = z.y - z.radius * 1.4;
+        const headBottom = z.y - z.radius * 0.35;
+        const bodyBottom = z.y + z.radius * 1.2;
+
+        if (Math.abs(b.x - z.x) < z.radius + 8 && b.y >= bodyTop && b.y <= bodyBottom) {
+          b.hitIds.add(z);
+          const isHeadshot = !b.fromAlly && b.y <= headBottom;
+          const finalDmg = Math.round(b.damage * (isHeadshot ? 2.5 : 1.0));
+          z.hp -= finalDmg;
+
+          if (!b.fromAlly) sfx.hit(isHeadshot);
+          addParticles(b.x, b.y, isHeadshot ? '#ff4d4d' : '#c92a2a', isHeadshot ? 8 : 4);
+          addPopup(
+            z.x,
+            bodyTop - 4,
+            isHeadshot ? `CRIT ${finalDmg}!` : `${finalDmg}`,
+            isHeadshot ? '#ff6b6b' : '#ffe082',
+            isHeadshot ? 1.15 : 0.95
+          );
+
+          if (z.hp <= 0) {
+            game.kills++;
+            combat.corpses.push({ x: z.x, y: z.y, color: z.color });
+            if (combat.corpses.length > 35) combat.corpses.shift();
+            combat.zombies.splice(j, 1);
+            refreshHud();
+          }
+
+          b.pierceLeft--;
+          if (b.pierceLeft <= 0) {
+            combat.bullets.splice(i, 1);
+            break;
+          }
+        }
+      }
+    }
+
+    // Avance y ataque a la barricada
+    for (let i = combat.zombies.length - 1; i >= 0; i--) {
+      const z = combat.zombies[i];
+      z.walkPhase += dt * (z.type === 'runner' ? 12 : 6.5);
+
+      if (z.x > barricadeX + z.radius) {
+        z.x -= z.speed * dt;
+      } else {
+        z.atkTimer -= dt;
+        if (z.atkTimer <= 0) {
+          z.atkTimer = 1.0;
+          game.barricadeHp = Math.max(0, game.barricadeHp - z.dmg);
+          addPopup(barricadeX + 10, z.y - 12, `-${z.dmg}`, '#ff5c5c', 0.95);
+          refreshHud();
+
+          if (game.barricadeHp <= 0) {
+            endGame(false, `Los infectados derribaron la barricada en el Día ${game.day}.`);
+            return;
+          }
+        }
+      }
+    }
+
+    // Partículas y números flotantes
+    for (let i = combat.particles.length - 1; i >= 0; i--) {
+      const p = combat.particles[i];
+      p.life -= dt;
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      if (p.life <= 0) combat.particles.splice(i, 1);
+    }
+
+    for (let i = combat.popups.length - 1; i >= 0; i--) {
+      const pop = combat.popups[i];
+      pop.life -= dt;
+      pop.y += pop.vy * dt;
+      if (pop.life <= 0) combat.popups.splice(i, 1);
+    }
+
+    // Fin de la noche (60s superados)
+    if (combat.nightTimeLeft <= 0) {
+      game.day++;
+      if (checkBombardmentLoss()) return;
+      enterDayPhase();
+    } else {
+      refreshHud();
+    }
+  }
+
+  /* =========================================================
+     RENDERIZADO VECTORIAL EN HTML5 CANVAS
+     ========================================================= */
+  function renderScene(w, h) {
+    ctx.clearRect(0, 0, w, h);
+
+    // Fondo urbano nocturno y suelo lateral
+    const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.28);
+    skyGrad.addColorStop(0, '#090c12');
+    skyGrad.addColorStop(1, '#151b24');
+    ctx.fillStyle = skyGrad;
+    ctx.fillRect(0, 0, w, h * 0.28);
+
+    // Siluetas de edificios al fondo
+    ctx.fillStyle = '#11161f';
+    for (let i = 0; i < 8; i++) {
+      const bx = i * (w / 7);
+      const bh = 38 + ((i * 29) % 42);
+      ctx.fillRect(bx, h * 0.28 - bh, w / 7 - 6, bh);
+    }
+
+    const groundGrad = ctx.createLinearGradient(0, h * 0.26, 0, h);
+    groundGrad.addColorStop(0, '#1d222a');
+    groundGrad.addColorStop(1, '#12151a');
+    ctx.fillStyle = groundGrad;
+    ctx.fillRect(0, h * 0.26, w, h * 0.74);
+
+    // Cadáveres en el suelo
+    ctx.globalAlpha = 0.55;
+    for (const c of combat.corpses) {
+      ctx.fillStyle = '#5e1414';
+      ctx.beginPath();
+      ctx.ellipse(c.x, c.y + 8, 18, 7, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = c.color;
+      ctx.fillRect(c.x - 14, c.y - 3, 28, 8);
+    }
+    ctx.globalAlpha = 1;
+
+    // Barricada a la izquierda
+    const barX = w * 0.11;
+    ctx.fillStyle = '#5c4024';
+    ctx.fillRect(barX - 8, h * 0.25, 18, h * 0.68);
+    ctx.strokeStyle = '#8a6338';
+    ctx.lineWidth = 2;
+    for (let y = h * 0.28; y < h * 0.9; y += 26) {
+      ctx.strokeRect(barX - 10, y, 22, 14);
+    }
+
+    // Aliados IA en la barricada
+    for (let i = 0; i < game.allies; i++) {
+      const ay = h * (0.34 + i * 0.14);
+      ctx.fillStyle = '#4c7c9e';
+      ctx.beginPath();
+      ctx.arc(barX - 16, ay - 14, 7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillRect(barX - 22, ay - 7, 12, 18);
+    }
+
+    // Protagonista apuntando hacia la derecha
+    const py = combat.playerY * h;
+    const px = barX - 4;
+    const ang = Math.atan2(combat.aimY * h - (py - 6), combat.aimX * w - px);
+
+    ctx.fillStyle = '#3b4859';
+    ctx.beginPath();
+    ctx.arc(px, py - 16, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillRect(px - 7, py - 8, 14, 20);
+
+    ctx.save();
+    ctx.translate(px, py - 4);
+    ctx.rotate(ang);
+    ctx.fillStyle = '#c9a66b';
+    ctx.fillRect(0, -3, 22, 5);
+    if (combat.muzzleFlash > 0) {
+      ctx.fillStyle = '#fff099';
+      ctx.beginPath();
+      ctx.arc(25, -1, 9, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // Zombis (caminante, corredor, blindado, cuerpo a cuerpo)
+    for (const z of combat.zombies) {
+      const bob = Math.sin(z.walkPhase) * 2.5;
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+      ctx.beginPath();
+      ctx.ellipse(z.x, z.y + z.radius + 4, z.radius, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cuerpo / torso
+      ctx.fillStyle = z.color;
+      ctx.fillRect(z.x - z.radius * 0.6, z.y - z.radius * 0.4 + bob, z.radius * 1.2, z.radius * 1.4);
+
+      // Cabeza (zona crítica x2.5)
+      ctx.fillStyle = z.type === 'armored' ? '#8fa3b8' : '#b7c4a8';
+      ctx.beginPath();
+      ctx.arc(z.x, z.y - z.radius * 0.8 + bob, z.radius * 0.55, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Indicador visual distintivo por tipo
+      if (z.type === 'melee') {
+        ctx.strokeStyle = '#ffbe44';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(z.x - z.radius, z.y + bob);
+        ctx.lineTo(z.x - z.radius - 12, z.y - 10 + bob);
+        ctx.stroke();
+      } else if (z.type === 'armored') {
+        ctx.strokeStyle = '#d0dce8';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(z.x - z.radius * 0.65, z.y - z.radius * 0.45 + bob, z.radius * 1.3, z.radius * 1.1);
+      }
+    }
+
+    // Balas
+    for (const b of combat.bullets) {
+      ctx.strokeStyle = b.color;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(b.x, b.y);
+      ctx.lineTo(b.x - b.vx * 0.018, b.y - b.vy * 0.018);
+      ctx.stroke();
+    }
+
+    // Partículas
+    for (const p of combat.particles) {
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x - 2, p.y - 2, 4, 4);
+    }
+
+    // Números flotantes de daño / crítico
+    ctx.textAlign = 'center';
+    for (const pop of combat.popups) {
+      ctx.font = `800 ${Math.round(12 * pop.scale)}px system-ui, sans-serif`;
+      ctx.fillStyle = pop.color;
+      ctx.fillText(pop.text, pop.x, pop.y);
+    }
+
+    // Mira en pantalla durante la noche
+    if (game.phase === 'night') {
+      const mx = combat.aimX * w;
+      const my = combat.aimY * h;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(mx - 11, my); ctx.lineTo(mx - 4, my);
+      ctx.moveTo(mx + 4, my); ctx.lineTo(mx + 11, my);
+      ctx.moveTo(mx, my - 11); ctx.lineTo(mx, my - 4);
+      ctx.moveTo(mx, my + 4); ctx.lineTo(mx, my + 11);
+      ctx.stroke();
+    }
+  }
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  loadGame();
+
+  if (game.phase === 'ended') {
+    endGame(
+      game.cityIndex === CITIES.length - 1,
+      game.cityIndex === CITIES.length - 1
+        ? `Ya habías llegado a Puerto Seguro en el Día ${game.day}.`
+        : 'Partida anterior finalizada.'
+    );
+  } else {
+    enterDayPhase();
+  }
+
+  let lastTs = performance.now();
+  function frame(now) {
+    requestAnimationFrame(frame);
+    const dt = Math.min(0.05, (now - lastTs) / 1000);
+    lastTs = now;
+
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+
+    if (game.phase === 'night') {
+      updateCombat(dt, w, h);
+    }
+    renderScene(w, h);
+  }
+
+  requestAnimationFrame(frame);
 })();
 </script>
 </body>
